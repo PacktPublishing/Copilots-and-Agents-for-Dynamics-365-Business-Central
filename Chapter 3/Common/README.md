@@ -1,16 +1,17 @@
-# Chapter03 Common
+# Chapter 3 - Common
 
-Shared AL app for **Chapter 3: Creating AI solutions with AL and Copilot Toolkit**. This app holds common tables (and optional enums/codeunits) used by the four copilot demos.
+Shared AL app for **Chapter 3: Creating AI solutions with AL and Copilot Toolkit**. This app holds common tables and pages used by the four copilot demos.
 
 ## Contents
 
-- **Tables:** Shared by two or more copilots (e.g. event/session setup, session master, agenda/schedule). Tables will be added when implementing the copilots.
-- **Enums:** Shared across copilots (e.g. session status, conference duration) when applicable.
-- No PromptDialog pages, no Azure OpenAI calls, no capability registration—only the shared data model.
+- **Event Copilot Setup** (table 50200, page 50201): Azure OpenAI configuration (endpoint, deployment, secret key). Used by Plan Event and other copilots that call Azure OpenAI. Open "Event Copilot Setup" in BC to configure.
+- **Event Copilot Admin** (permission set 50202): Assign to users who may open and edit Event Copilot Setup.
+- **Tables:** Additional shared tables (e.g. session master, agenda) will be added when implementing Copilot 3 and 4.
+- No capability registration or AI logic in Common—only the shared data model and setup.
 
 ## Build order
 
-Build and publish this app **first** so that the copilot apps (Plan the Event, Event Project and Tasks, Import Session Proposals, Build Conference Agenda) can reference it. Place the built `.app` or symbols in each copilot project's `.alpackages` folder (or use a shared package cache path).
+Build and publish this app **first** so that the copilot apps (Plan Event, Event Project and Tasks, Import Session Proposals, Build Conference Agenda) can reference it. Place the built `.app` or symbols in each copilot project's `.alpackages` folder (or use a shared package cache path).
 
 ## Requirements
 
