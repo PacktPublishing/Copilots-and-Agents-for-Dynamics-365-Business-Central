@@ -4,5 +4,7 @@ permissionset 50202 "Event Copilot Admin"
     Caption = 'Event Copilot Admin';
     Permissions =
         tabledata "Event Copilot Setup" = RIMD,
-        page "Event Copilot Setup" = X;
+        tabledata "Event Session" = RIMD,
+        page "Event Copilot Setup" = X,
+        page "Event Sessions" = X;
 }

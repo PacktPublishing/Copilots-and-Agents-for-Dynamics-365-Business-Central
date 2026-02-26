@@ -5,9 +5,13 @@ Shared AL app for **Chapter 3: Creating AI solutions with AL and Copilot Toolkit
 ## Contents
 
 - **Event Copilot Setup** (table 50200, page 50201): Azure OpenAI configuration (endpoint, deployment, secret key). Used by Plan Event and other copilots that call Azure OpenAI. Open "Event Copilot Setup" in BC to configure.
-- **Event Copilot Admin** (permission set 50202): Assign to users who may open and edit Event Copilot Setup.
-- **Tables:** Additional shared tables (e.g. session master, agenda) will be added when implementing Copilot 3 and 4.
-- No capability registration or AI logic in Common—only the shared data model and setup.
+- **Event Copilot Admin** (permission set 50202): Assign to users who may open and edit Event Copilot Setup and Event Session data.
+- **Event Session** (table 50211): Session proposals imported from Excel (Copilot 3) and used for agenda building (Copilot 4). Fields include Code, Name, Description, Speaker1–4, Date, Duration, Status, Project Code (Job), Track No., Start/End Time.
+- **Event Session Status** (enum 50210): Draft, Scheduled, Cancelled, Completed.
+- **Event Sessions** (page 50212): List page for Event Session records. Usage category: Lists.
+- **Event Sessions Job List Ext** (page extension 50213): Adds an "Event Sessions" action on Job List that opens event sessions filtered by the current project.
+
+No capability registration or AI logic in Common—only the shared data model and setup.
 
 ## Build order
 
