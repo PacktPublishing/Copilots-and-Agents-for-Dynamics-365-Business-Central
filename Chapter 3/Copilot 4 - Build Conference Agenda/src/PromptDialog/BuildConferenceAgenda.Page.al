@@ -67,7 +67,7 @@ page 50610 "Build Conference Agenda"
         }
         area(PromptGuide)
         {
-            // --- Build agenda (triggers GetSessions + GetEventSchedule + SaveAgenda) ---
+            // --- Build agenda (triggers GetSessions + GetEventInfo + SaveAgenda) ---
             group(Build)
             {
                 Caption = 'Build agenda';

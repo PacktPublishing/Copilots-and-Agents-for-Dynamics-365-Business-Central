@@ -8,7 +8,7 @@ codeunit 50609 "Build Agenda Impl"
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
         AOAIOperationResponse: Codeunit "AOAI Operation Response";
         GetSessionsTool: Codeunit "Get Sessions";
-        GetEventScheduleTool: Codeunit "Get Event Schedule";
+        GetEventInfoTool: Codeunit "Get Event Info";
         SaveAgendaTool: Codeunit "Save Agenda";
         GetCurrentAgendaTool: Codeunit "Get Current Agenda";
     begin
@@ -32,8 +32,8 @@ codeunit 50609 "Build Agenda Impl"
         GetSessionsTool.SetProjectCode(ProjectCode);
         AOAIChatMessages.AddTool(GetSessionsTool);
 
-        GetEventScheduleTool.SetProjectCode(ProjectCode);
-        AOAIChatMessages.AddTool(GetEventScheduleTool);
+        GetEventInfoTool.SetProjectCode(ProjectCode);
+        AOAIChatMessages.AddTool(GetEventInfoTool);
 
         SaveAgendaTool.SetContext(AgendaProposal);
         AOAIChatMessages.AddTool(SaveAgendaTool);
@@ -87,7 +87,7 @@ You are an AI assistant that builds a conference agenda. You have tools to read 
 
 When the user asks to build, schedule, or reschedule the agenda:
 1. Call GetSessions to get the list of sessions to schedule. Use statusFilter ''draft'' for a first-time build; use statusFilter ''scheduled'' when the user asks to reschedule or build a new agenda from scratch (so you get the currently scheduled sessions).
-2. Call GetEventSchedule to get the time constraints.
+2. Call GetEventInfo to get the general event information like start date, end date, daily start and end times, lunch break window, and the required break duration between sessions.
 3. Build an optimal schedule that respects all constraints.
 4. Call SaveAgenda with the complete schedule.
 

@@ -1,4 +1,4 @@
-codeunit 50606 "Get Event Schedule" implements "AOAI Function"
+codeunit 50606 "Get Event Info" implements "AOAI Function"
 {
     var
         ProjectCode: Code[20];
@@ -10,7 +10,7 @@ codeunit 50606 "Get Event Schedule" implements "AOAI Function"
 
     procedure GetName(): Text
     begin
-        exit('GetEventSchedule');
+        exit('GetEventInfo');
     end;
 
     procedure GetPrompt() ToolJObj: JsonObject

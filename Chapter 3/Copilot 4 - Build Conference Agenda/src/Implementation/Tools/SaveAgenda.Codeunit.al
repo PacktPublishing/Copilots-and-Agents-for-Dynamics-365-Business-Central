@@ -76,7 +76,7 @@ codeunit 50607 "Save Agenda" implements "AOAI Function"
         ParametersJObject.Add('required', ScheduleRequiredArray);
 
         FunctionJObject.Add('name', GetName());
-        FunctionJObject.Add('description', 'Saves the proposed conference schedule. Call this after determining the optimal schedule for all sessions using the data from GetSessions and GetEventSchedule. Provide a complete schedule for every session.');
+        FunctionJObject.Add('description', 'Saves the proposed conference schedule. Call this after determining the optimal schedule for all sessions using the data from GetSessions and GetEventInfo. Provide a complete schedule for every session.');
         FunctionJObject.Add('parameters', ParametersJObject);
 
         ToolJObj.Add('type', 'function');

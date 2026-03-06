@@ -8,7 +8,7 @@ This copilot introduces **tool calling** (function calling): the AI model calls 
 
 - **AOAI Function interface** — each tool is an AL codeunit implementing `GetName`, `GetPrompt`, and `Execute`.
 - **Multi-round tool calling** — the model reads data (round 1), reasons over it, then writes the schedule (round 2). The Copilot Toolkit handles this automatically via `SetToolInvokePreference(Automatic)`.
-- **Intent detection** — the same copilot serves two intents: "build the agenda" (calls GetSessions + GetEventSchedule + SaveAgenda) vs. "show the current agenda" (calls GetCurrentAgenda). The model decides which tools to call based on the natural language input.
+- **Intent detection** — the same copilot serves two intents: "build the agenda" (calls GetSessions + GetEventInfo + SaveAgenda) vs. "show the current agenda" (calls GetCurrentAgenda). The model decides which tools to call based on the natural language input.
 - **Human-in-the-loop** — `SaveAgenda` fills a temporary `Agenda Proposal` table for the user to review. The actual `Event Session` records are only updated when the user clicks **Apply** (OK).
 - **Prompt Guides** — ready-made `area(PromptGuide)` templates grouped by intent (Build / Review / Adjust) that prefill the free-text input.
 
@@ -17,7 +17,7 @@ This copilot introduces **tool calling** (function calling): the AI model calls 
 | Tool | ID | Intent | What it does |
 |---|---|---|---|
 | GetSessions | 50605 | Build | Returns all Draft Event Sessions for the project |
-| GetEventSchedule | 50606 | Build | Returns event dates and daily time constraints from the Job record |
+| GetEventInfo | 50606 | Build | Returns event dates and daily time constraints from the Job record |
 | SaveAgenda | 50607 | Build | Parses the model's JSON schedule and inserts rows into the temp Agenda Proposal table |
 | GetCurrentAgenda | 50608 | Review | Returns all Scheduled Event Sessions for the project |
 
@@ -29,7 +29,7 @@ This copilot introduces **tool calling** (function calling): the AI model calls 
 | 50601 | Codeunit | Build Agenda Install |
 | 50603 | Table (temp) | Agenda Proposal |
 | 50605 | Codeunit | Get Sessions |
-| 50606 | Codeunit | Get Event Schedule |
+| 50606 | Codeunit | Get Event Info |
 | 50607 | Codeunit | Save Agenda |
 | 50608 | Codeunit | Get Current Agenda |
 | 50609 | Codeunit | Build Agenda Impl |
@@ -42,7 +42,7 @@ This copilot introduces **tool calling** (function calling): the AI model calls 
 1. Open the **Job List**, select an event project, choose **Build Conference Agenda** in the Prompting action group.
 2. The **Build Conference Agenda** PromptDialog opens. Type a request or pick a Prompt Guide template.
 3. Click **Build Agenda** → `Generate` is called → Azure OpenAI receives the system message and the four registered tools.
-4. **Round 1 (automatic):** The model calls `GetSessions` and `GetEventSchedule` → Toolkit executes both → appends results to the chat history → calls `GenerateChatCompletion` again.
+4. **Round 1 (automatic):** The model calls `GetSessions` and `GetEventInfo` → Toolkit executes both → appends results to the chat history → calls `GenerateChatCompletion` again.
 5. **Round 2 (automatic):** The model reasons over sessions and constraints, then calls `SaveAgenda` with a JSON array of scheduled sessions → Toolkit executes `SaveAgenda` → sessions are inserted into the shared temporary `Agenda Proposal` table → appends the confirmation → calls `GenerateChatCompletion` again.
 6. **Round 3:** The model returns a text summary (no more tool calls) — for example "Scheduled 12 sessions across 2 days and 3 tracks."
 7. The proposed schedule is displayed in the **Agenda Proposal** list (Session Code, Description, Date, Track, Start/End Time).
