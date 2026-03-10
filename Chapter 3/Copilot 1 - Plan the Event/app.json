@@ -1,0 +1,37 @@
+{
+  "id": "b2c3d4e5-f6a7-5b6c-9d0e-1f2a3b4c5d6e",
+  "name": "Chapter 3 - Plan Event",
+  "publisher": "Packt",
+  "version": "1.0.0.0",
+  "brief": "Generates plain-text planning steps from an Event Brief using PromptDialog and Azure OpenAI.",
+  "description": "Chapter 3 demo - Plan Event copilot. User provides the Event Brief (text or Markdown); the copilot returns plain text proposing steps or tasks for how to plan and organize the event. Uses PromptDialog, Azure OpenAI chat completion, and capability registration.",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+    {
+      "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+      "name": "Chapter 3 - Common",
+      "publisher": "Packt",
+      "version": "1.0.0.0"
+    }
+  ],
+  "screenshots": [],
+  "platform": "27.0.0.0",
+  "application": "27.0.0.0",
+  "idRanges": [
+    {
+      "from": 50300,
+      "to": 50399
+    }
+  ],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": true,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "16.0",
+  "features": ["NoImplicitWith"]
+}
