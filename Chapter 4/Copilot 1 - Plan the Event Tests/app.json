@@ -1,0 +1,45 @@
+{
+  "id": "f6a7b8c9-d0e1-9f0a-3b4c-5d6e7f8a9b0c",
+  "name": "Chapter 4 - Plan the Event Tests",
+  "publisher": "Packt",
+  "version": "1.0.0.0",
+  "brief": "AI Test Toolkit tests for the Plan the Event copilot (Chapter 3).",
+  "description": "Test app for Chapter 4. Data-driven tests for the Plan the Event copilot built in Chapter 3. Depends on Chapter 3 - Common, Chapter 3 - Plan Event, and the AI Test Toolkit.",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+    {
+      "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+      "name": "Chapter 3 - Common",
+      "publisher": "Packt",
+      "version": "1.0.0.0"
+    },
+    {
+      "id": "b2c3d4e5-f6a7-5b6c-9d0e-1f2a3b4c5d6e",
+      "name": "Chapter 3 - Plan Event",
+      "publisher": "Packt",
+      "version": "1.0.0.0"
+    },
+    {
+      "id": "2156302a-872f-4568-be0b-60968696f0d5",
+      "name": "AI Test Toolkit",
+      "publisher": "Microsoft",
+      "version": "27.0.0.0"
+    }
+  ],
+  "screenshots": [],
+  "platform": "27.0.0.0",
+  "application": "27.0.0.0",
+  "idRanges": [{ "from": 50700, "to": 50719 }],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": true,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "16.0",
+  "features": ["NoImplicitWith"],
+  "resourceFolders": [".resources"]
+}
