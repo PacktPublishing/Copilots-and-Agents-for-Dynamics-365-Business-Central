@@ -1,37 +1,39 @@
 {
-  "id": "e5f6a7b8-c9d0-8e9f-2a3b-4c5d6e7f8a9b",
-  "name": "Chapter 3 - Build Conference Agenda",
-  "publisher": "Packt",
-  "version": "1.0.0.0",
-  "brief": "Builds the conference agenda using tool calling (GetSessions, GetEventInfo, SaveAgenda) with existing BC data.",
-  "description": "Chapter 3 demo - Build the conference agenda using tool calling (function calling). Tools read existing BC data (GetSessions, GetEventInfo, optionally GetCurrentAgenda) and write the schedule (SaveAgenda). Intent detection, deterministic logic, structured output.",
-  "privacyStatement": "",
-  "EULA": "",
-  "help": "",
-  "url": "",
-  "logo": "",
-  "dependencies": [
-    {
-      "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
-      "name": "Chapter 3 - Common",
-      "publisher": "Packt",
-      "version": "1.0.0.0"
-    }
-  ],
-  "screenshots": [],
-  "platform": "27.0.0.0",
-  "application": "27.0.0.0",
-  "idRanges": [
-    {
-      "from": 50600,
-      "to": 50699
-    }
-  ],
-  "resourceExposurePolicy": {
-    "allowDebugging": true,
-    "allowDownloadingSource": true,
-    "includeSourceInSymbolFile": true
-  },
-  "runtime": "16.0",
-  "features": ["NoImplicitWith"]
+    "id": "e5f6a7b8-c9d0-8e9f-2a3b-4c5d6e7f8a9b",
+    "name": "Chapter 3 - Build Conference Agenda",
+    "publisher": "Packt",
+    "version": "1.0.0.1",
+    "brief": "Builds the conference agenda using tool calling (GetSessions, GetEventInfo, SaveAgenda) with existing BC data.",
+    "description": "Chapter 3 demo - Build the conference agenda using tool calling (function calling). Tools read existing BC data (GetSessions, GetEventInfo, optionally GetCurrentAgenda) and write the schedule (SaveAgenda). Intent detection, deterministic logic, structured output.",
+    "privacyStatement": "",
+    "EULA": "",
+    "help": "",
+    "url": "",
+    "logo": "",
+    "dependencies": [
+        {
+            "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+            "name": "Chapter 3 - Common",
+            "publisher": "Packt",
+            "version": "1.0.0.0"
+        }
+    ],
+    "screenshots": [],
+    "platform": "28.0.0.0",
+    "application": "28.0.0.0",
+    "idRanges": [
+        {
+            "from": 50600,
+            "to": 50699
+        }
+    ],
+    "resourceExposurePolicy": {
+        "allowDebugging": true,
+        "allowDownloadingSource": true,
+        "includeSourceInSymbolFile": true
+    },
+    "runtime": "16.0",
+    "features": [
+        "NoImplicitWith"
+    ]
 }

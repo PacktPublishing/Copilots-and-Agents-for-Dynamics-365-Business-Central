@@ -2,7 +2,6 @@ codeunit 50403 "Create Event Project Impl"
 {
     procedure GenerateEventProject(EventBrief: Text; var JobDescription: Text[100]; var JobFullDescription: Text; var CustomerName: Text[100]; var EventProjectProposal: Record "Event Project Proposal")
     var
-        CopilotSetup: Record "Event Copilot Setup";
         AzureOpenAI: Codeunit "Azure OpenAI";
         AOAIChatMessages: Codeunit "AOAI Chat Messages";
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
@@ -12,15 +11,8 @@ codeunit 50403 "Create Event Project Impl"
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Create Event Project") then
             exit;
 
-        if not CopilotSetup.FindFirst() then
-            Error(SetupMissingErr);
-
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Create Event Project");
-        AzureOpenAI.SetAuthorization(
-            Enum::"AOAI Model Type"::"Chat Completions",
-            CopilotSetup.GetEndpoint(),
-            CopilotSetup.GetDeployment(),
-            CopilotSetup.GetSecretKey());
+        SetAzureOpenAIAuthorization(AzureOpenAI);
 
         AOAIChatCompletionParams.SetTemperature(0.7);
         AOAIChatCompletionParams.SetJsonMode(true);
@@ -36,6 +28,26 @@ codeunit 50403 "Create Event Project Impl"
         ResponseText := AOAIChatMessages.GetLastMessage();
         ResponseText := StripJsonMarkdownFence(ResponseText);
         ParseJsonToProposal(ResponseText, JobDescription, JobFullDescription, CustomerName, EventProjectProposal);
+    end;
+
+    local procedure SetAzureOpenAIAuthorization(var AzureOpenAI: Codeunit "Azure OpenAI")
+    var
+        CopilotSetup: Record "Event Copilot Setup";
+        EnvironmentInformation: Codeunit "Environment Information";
+        AOAIDeployments: Codeunit "AOAI Deployments";
+    begin
+        if not EnvironmentInformation.IsSaaSInfrastructure() then begin
+            if not CopilotSetup.FindFirst() then
+                Error(SetupMissingErr);
+            AzureOpenAI.SetAuthorization(
+                Enum::"AOAI Model Type"::"Chat Completions",
+                CopilotSetup.GetEndpoint(),
+                CopilotSetup.GetDeployment(),
+                CopilotSetup.GetSecretKey());
+        end else
+            AzureOpenAI.SetManagedResourceAuthorization(
+                Enum::"AOAI Model Type"::"Chat Completions",
+                AOAIDeployments.GetGPT41Latest());
     end;
 
     local procedure GetSystemMessage(): Text

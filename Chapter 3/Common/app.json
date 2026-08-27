@@ -1,30 +1,32 @@
 {
-  "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
-  "name": "Chapter 3 - Common",
-  "publisher": "Packt",
-  "version": "1.0.0.0",
-  "brief": "Shared tables and data model for Chapter 3 copilot demos.",
-  "description": "Common app for AI solutions with AL and Copilot Toolkit (Chapter 3). Contains shared tables used by the Plan Event, Event Project and Tasks, Import Session Proposals, and Build Conference Agenda copilots. Build and publish this app first so the copilot apps can reference it.",
-  "privacyStatement": "",
-  "EULA": "",
-  "help": "",
-  "url": "",
-  "logo": "",
-  "dependencies": [],
-  "screenshots": [],
-  "platform": "27.0.0.0",
-  "application": "27.0.0.0",
-  "idRanges": [
-    {
-      "from": 50200,
-      "to": 50299
-    }
-  ],
-  "resourceExposurePolicy": {
-    "allowDebugging": true,
-    "allowDownloadingSource": true,
-    "includeSourceInSymbolFile": true
-  },
-  "runtime": "16.0",
-  "features": ["NoImplicitWith"]
+    "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+    "name": "Chapter 3 - Common",
+    "publisher": "Packt",
+    "version": "1.0.0.1",
+    "brief": "Shared tables and data model for Chapter 3 copilot demos.",
+    "description": "Common app for AI solutions with AL and Copilot Toolkit (Chapter 3). Contains shared tables used by the Plan Event, Event Project and Tasks, Import Session Proposals, and Build Conference Agenda copilots. Build and publish this app first so the copilot apps can reference it.",
+    "privacyStatement": "",
+    "EULA": "",
+    "help": "",
+    "url": "",
+    "logo": "",
+    "dependencies": [],
+    "screenshots": [],
+    "platform": "28.0.0.0",
+    "application": "28.0.0.0",
+    "idRanges": [
+        {
+            "from": 50200,
+            "to": 50299
+        }
+    ],
+    "resourceExposurePolicy": {
+        "allowDebugging": true,
+        "allowDownloadingSource": true,
+        "includeSourceInSymbolFile": true
+    },
+    "runtime": "16.0",
+    "features": [
+        "NoImplicitWith"
+    ]
 }

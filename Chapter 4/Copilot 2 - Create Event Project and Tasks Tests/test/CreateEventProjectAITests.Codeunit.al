@@ -14,6 +14,7 @@ codeunit 50721 "Create Event Project AI Tests"
     var
         CreateEventProjectImpl: Codeunit "Create Event Project Impl";
         EventProjectProposal: Record "Event Project Proposal";
+        Assert: Codeunit "Library Assert";
         TestInputJsonAnswer: Codeunit "Test Input Json";
         ExpectedMinJson: Codeunit "Test Input Json";
         ExpectedMaxJson: Codeunit "Test Input Json";
@@ -39,21 +40,21 @@ codeunit 50721 "Create Event Project AI Tests"
 
         ExpectedMinJson := TestInputJsonAnswer.ElementExists('min_tasks', Found);
         if not Found then
-            AssertFail('Expected "min_tasks" field not found in expected_data.');
+            Assert.Fail('Expected "min_tasks" field not found in expected_data.');
 
-        AssertIsTrue(TaskCount >= ExpectedMinJson.ValueAsInteger(), StrSubstNo('Task line count %1 is below expected_data min_tasks %2.', TaskCount, ExpectedMinJson.ValueAsInteger()));
+        Assert.IsTrue(TaskCount >= ExpectedMinJson.ValueAsInteger(), StrSubstNo('Task line count %1 is below expected_data min_tasks %2.', TaskCount, ExpectedMinJson.ValueAsInteger()));
 
         ExpectedMaxJson := TestInputJsonAnswer.ElementExists('max_tasks', Found);
         if Found then
-            AssertIsTrue(TaskCount <= ExpectedMaxJson.ValueAsInteger(), StrSubstNo('Task line count %1 is above expected_data max_tasks %2.', TaskCount, ExpectedMaxJson.ValueAsInteger()));
+            Assert.IsTrue(TaskCount <= ExpectedMaxJson.ValueAsInteger(), StrSubstNo('Task line count %1 is above expected_data max_tasks %2.', TaskCount, ExpectedMaxJson.ValueAsInteger()));
 
         ExpectedFlagJson := TestInputJsonAnswer.ElementExists('job_short_description_mandatory', Found);
         if Found and ExpectedFlagJson.ValueAsBoolean() then
-            AssertIsTrue(JobDescription <> '', 'Create Event Project returned an empty job short description but expected_data requires job_short_description_mandatory.');
+            Assert.IsTrue(JobDescription <> '', 'Create Event Project returned an empty job short description but expected_data requires job_short_description_mandatory.');
 
         ExpectedFlagJson := TestInputJsonAnswer.ElementExists('job_full_description_mandatory', Found);
         if Found and ExpectedFlagJson.ValueAsBoolean() then
-            AssertIsTrue(JobFullDescription <> '', 'Create Event Project returned an empty job full description but expected_data requires job_full_description_mandatory.');
+            Assert.IsTrue(JobFullDescription <> '', 'Create Event Project returned an empty job full description but expected_data requires job_full_description_mandatory.');
 
         AITTestContext.SetAccuracy(1.0);
         AITTestContext.SetTestOutput(BuildSuccessOutputJsonArray(JobDescription, JobFullDescription, CustomerName, TaskCount));
@@ -89,18 +90,6 @@ codeunit 50721 "Create Event Project AI Tests"
         Row.Add('property', PropertyName);
         Row.Add('value', PropertyValue);
         TargetArray.Add(Row.AsToken());
-    end;
-
-    local procedure AssertIsTrue(Condition: Boolean; Msg: Text)
-    begin
-        if Condition then
-            exit;
-        Error(Msg);
-    end;
-
-    local procedure AssertFail(Msg: Text)
-    begin
-        Error(Msg);
     end;
 
     local procedure CountAllTasks(var EventProjectProposal: Record "Event Project Proposal"): Integer

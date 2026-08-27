@@ -2,7 +2,6 @@ codeunit 50303 "Plan Event Impl"
 {
     procedure GeneratePlanningSteps(EventBrief: Text): Text
     var
-        CopilotSetup: Record "Event Copilot Setup";
         AzureOpenAI: Codeunit "Azure OpenAI";
         AOAIChatMessages: Codeunit "AOAI Chat Messages";
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
@@ -11,15 +10,8 @@ codeunit 50303 "Plan Event Impl"
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Plan Event") then
             exit('');
 
-        if not CopilotSetup.Get() then
-            Error(SetupMissingErr);
-
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Plan Event");
-        AzureOpenAI.SetAuthorization(
-            Enum::"AOAI Model Type"::"Chat Completions",
-            CopilotSetup.GetEndpoint(),
-            CopilotSetup.GetDeployment(),
-            CopilotSetup.GetSecretKey());
+        SetAzureOpenAIAuthorization(AzureOpenAI);
 
         AOAIChatMessages.AddSystemMessage(GetSystemMessage());
         AOAIChatMessages.AddUserMessage(EventBrief);
@@ -30,6 +22,26 @@ codeunit 50303 "Plan Event Impl"
             exit(AOAIChatMessages.GetLastMessage())
         else
             Error(AOAIOperationResponse.GetError());
+    end;
+
+    local procedure SetAzureOpenAIAuthorization(var AzureOpenAI: Codeunit "Azure OpenAI")
+    var
+        CopilotSetup: Record "Event Copilot Setup";
+        EnvironmentInformation: Codeunit "Environment Information";
+        AOAIDeployments: Codeunit "AOAI Deployments";
+    begin
+        if not EnvironmentInformation.IsSaaSInfrastructure() then begin
+            if not CopilotSetup.Get() then
+                Error(SetupMissingErr);
+            AzureOpenAI.SetAuthorization(
+                Enum::"AOAI Model Type"::"Chat Completions",
+                CopilotSetup.GetEndpoint(),
+                CopilotSetup.GetDeployment(),
+                CopilotSetup.GetSecretKey());
+        end else
+            AzureOpenAI.SetManagedResourceAuthorization(
+                Enum::"AOAI Model Type"::"Chat Completions",
+                AOAIDeployments.GetGPT41Latest());
     end;
 
     local procedure GetSystemMessage(): Text

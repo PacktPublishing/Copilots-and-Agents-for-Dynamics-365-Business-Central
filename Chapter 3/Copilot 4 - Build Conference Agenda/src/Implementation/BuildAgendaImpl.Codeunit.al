@@ -2,7 +2,6 @@ codeunit 50609 "Build Agenda Impl"
 {
     procedure Generate(ProjectCode: Code[20]; UserInput: Text; var AgendaProposal: Record "Agenda Proposal"): Text
     var
-        CopilotSetup: Record "Event Copilot Setup";
         AzureOpenAI: Codeunit "Azure OpenAI";
         AOAIChatMessages: Codeunit "AOAI Chat Messages";
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
@@ -15,15 +14,8 @@ codeunit 50609 "Build Agenda Impl"
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Build Conference Agenda") then
             exit('');
 
-        if not CopilotSetup.Get() then
-            Error(SetupMissingErr);
-
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Build Conference Agenda");
-        AzureOpenAI.SetAuthorization(
-            Enum::"AOAI Model Type"::"Chat Completions",
-            CopilotSetup.GetEndpoint(),
-            CopilotSetup.GetDeployment(),
-            CopilotSetup.GetSecretKey());
+        SetAzureOpenAIAuthorization(AzureOpenAI);
 
         AOAIChatCompletionParams.SetTemperature(0);
 
@@ -52,6 +44,26 @@ codeunit 50609 "Build Agenda Impl"
             exit(AOAIChatMessages.GetLastMessage())
         else
             Error(AOAIOperationResponse.GetError());
+    end;
+
+    local procedure SetAzureOpenAIAuthorization(var AzureOpenAI: Codeunit "Azure OpenAI")
+    var
+        CopilotSetup: Record "Event Copilot Setup";
+        EnvironmentInformation: Codeunit "Environment Information";
+        AOAIDeployments: Codeunit "AOAI Deployments";
+    begin
+        if not EnvironmentInformation.IsSaaSInfrastructure() then begin
+            if not CopilotSetup.Get() then
+                Error(SetupMissingErr);
+            AzureOpenAI.SetAuthorization(
+                Enum::"AOAI Model Type"::"Chat Completions",
+                CopilotSetup.GetEndpoint(),
+                CopilotSetup.GetDeployment(),
+                CopilotSetup.GetSecretKey());
+        end else
+            AzureOpenAI.SetManagedResourceAuthorization(
+                Enum::"AOAI Model Type"::"Chat Completions",
+                AOAIDeployments.GetGPT41Latest());
     end;
 
     procedure Apply(var AgendaProposal: Record "Agenda Proposal")

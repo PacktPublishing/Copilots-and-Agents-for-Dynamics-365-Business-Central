@@ -1,0 +1,3 @@
+{"name": "build_agenda", "question": "Build the full conference agenda for this event project. Schedule every draft session.", "test_setup": {"project_code": "JOB-001", "intent": "build"}}
+{"name": "rebuild_agenda", "question": "Reschedule all sessions and rebuild the full conference agenda from scratch.", "test_setup": {"project_code": "JOB-001", "intent": "build"}}
+{"name": "show_agenda", "question": "What does the current agenda look like? Summarize scheduled sessions briefly.", "test_setup": {"project_code": "JOB-001", "intent": "show"}}

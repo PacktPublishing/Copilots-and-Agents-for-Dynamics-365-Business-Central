@@ -7,7 +7,6 @@ codeunit 50504 "Import Session Proposals Impl"
         Project: Record Job;
         var FieldMappingProposal: Record "Field Mapping Proposal")
     var
-        CopilotSetup: Record "Event Copilot Setup";
         AzureOpenAI: Codeunit "Azure OpenAI";
         AOAIChatMessages: Codeunit "AOAI Chat Messages";
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
@@ -17,15 +16,8 @@ codeunit 50504 "Import Session Proposals Impl"
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Import Session Proposals") then
             exit;
 
-        if not CopilotSetup.FindFirst() then
-            Error(SetupMissingErr);
-
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Import Session Proposals");
-        AzureOpenAI.SetAuthorization(
-            Enum::"AOAI Model Type"::"Chat Completions",
-            CopilotSetup.GetEndpoint(),
-            CopilotSetup.GetDeployment(),
-            CopilotSetup.GetSecretKey());
+        SetAzureOpenAIAuthorization(AzureOpenAI);
 
         AOAIChatCompletionParams.SetTemperature(0);
         AOAIChatCompletionParams.SetJsonMode(true);
@@ -41,6 +33,26 @@ codeunit 50504 "Import Session Proposals Impl"
         ResponseText := AOAIChatMessages.GetLastMessage();
         ResponseText := StripJsonMarkdownFence(ResponseText);
         ParseMappingResponseToProposal(ResponseText, GenerationId, FieldMappingProposal);
+    end;
+
+    local procedure SetAzureOpenAIAuthorization(var AzureOpenAI: Codeunit "Azure OpenAI")
+    var
+        CopilotSetup: Record "Event Copilot Setup";
+        EnvironmentInformation: Codeunit "Environment Information";
+        AOAIDeployments: Codeunit "AOAI Deployments";
+    begin
+        if not EnvironmentInformation.IsSaaSInfrastructure() then begin
+            if not CopilotSetup.FindFirst() then
+                Error(SetupMissingErr);
+            AzureOpenAI.SetAuthorization(
+                Enum::"AOAI Model Type"::"Chat Completions",
+                CopilotSetup.GetEndpoint(),
+                CopilotSetup.GetDeployment(),
+                CopilotSetup.GetSecretKey());
+        end else
+            AzureOpenAI.SetManagedResourceAuthorization(
+                Enum::"AOAI Model Type"::"Chat Completions",
+                AOAIDeployments.GetGPT41Latest());
     end;
 
     procedure ImportSessionsUsingMapping(var Job: Record Job; var ExcelBuffer: Record "Excel Buffer"; var FieldMappingProposal: Record "Field Mapping Proposal")

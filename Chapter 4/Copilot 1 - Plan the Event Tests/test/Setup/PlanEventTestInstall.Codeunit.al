@@ -8,6 +8,11 @@ codeunit 50700 "Plan Event Test Install"
     Subtype = Install;
 
     trigger OnInstallAppPerCompany()
+    begin
+        ImportResources();
+    end;
+
+    procedure ImportResources()
     var
         DatasetPaths: List of [Text];
         TestSuitePaths: List of [Text];
