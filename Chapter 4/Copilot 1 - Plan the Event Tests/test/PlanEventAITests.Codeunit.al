@@ -13,6 +13,7 @@ codeunit 50701 "Plan Event AI Tests"
         PlanEventImpl: Codeunit "Plan Event Impl";
         ExpectedDataJson: Codeunit "Test Input Json";
         CheckElement: Codeunit "Test Input Json";
+        TestOutputJson: Codeunit "Test Output Json";
         Question: Text;
         Answer: Text;
         Accuracy: Decimal;
@@ -53,8 +54,13 @@ codeunit 50701 "Plan Event AI Tests"
         if Answer = '' then
             Accuracy := 0.0;
 
+        // Prepare JSON for external evaluation
+        TestOutputJson.Initialize();
+        TestOutputJson.Add('question', Question);
+        TestOutputJson.Add('answer', Answer);
+
         AITTestContext.SetAccuracy(Accuracy);
-        AITTestContext.SetTestOutput(Answer);
+        AITTestContext.SetTestOutput(TestOutputJson);
     end;
 
     [TryFunction]

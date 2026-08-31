@@ -2,7 +2,7 @@
     "id": "f6a7b8c9-d0e1-9f0a-3b4c-5d6e7f8a9b0c",
     "name": "Chapter 4 - Plan the Event Tests",
     "publisher": "Packt",
-    "version": "1.0.0.6",
+    "version": "1.0.0.8",
     "brief": "AI Test Toolkit tests for the Plan the Event copilot (Chapter 3).",
     "description": "Test app for Chapter 4. Data-driven tests for the Plan the Event copilot built in Chapter 3. Depends on Chapter 3 - Common, Chapter 3 - Plan Event, and the AI Test Toolkit.",
     "privacyStatement": "",
