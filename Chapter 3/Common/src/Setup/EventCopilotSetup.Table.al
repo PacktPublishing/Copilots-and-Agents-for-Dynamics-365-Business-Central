@@ -67,4 +67,17 @@ table 50200 "Event Copilot Setup"
         IsolatedStorage.Set(NewSecretGuid, SecretKey, DataScope::Module);
         Rec."Secret Key" := NewSecretGuid;
     end;
+
+    procedure IsConfigured(): Boolean
+    begin
+        if not Rec.Get() then
+            exit(false);
+        if Rec.Endpoint = '' then
+            exit(false);
+        if Rec.Deployment = '' then
+            exit(false);
+        if IsNullGuid(Rec."Secret Key") then
+            exit(false);
+        exit(GetSecretKey() <> '');
+    end;
 }

@@ -33,18 +33,15 @@ codeunit 50403 "Create Event Project Impl"
     local procedure SetAzureOpenAIAuthorization(var AzureOpenAI: Codeunit "Azure OpenAI")
     var
         CopilotSetup: Record "Event Copilot Setup";
-        EnvironmentInformation: Codeunit "Environment Information";
         AOAIDeployments: Codeunit "AOAI Deployments";
     begin
-        if not EnvironmentInformation.IsSaaSInfrastructure() then begin
-            if not CopilotSetup.FindFirst() then
-                Error(SetupMissingErr);
+        if CopilotSetup.IsConfigured() then
             AzureOpenAI.SetAuthorization(
                 Enum::"AOAI Model Type"::"Chat Completions",
                 CopilotSetup.GetEndpoint(),
                 CopilotSetup.GetDeployment(),
-                CopilotSetup.GetSecretKey());
-        end else
+                CopilotSetup.GetSecretKey())
+        else
             AzureOpenAI.SetManagedResourceAuthorization(
                 Enum::"AOAI Model Type"::"Chat Completions",
                 AOAIDeployments.GetGPT41Latest());
@@ -231,7 +228,6 @@ Use %1 as the project start date. Generate at least 4 tasks. Use yyyy-mm-dd for 
     end;
 
     var
-        SetupMissingErr: Label 'Event Copilot Setup is missing. Open Event Copilot Setup and enter Azure OpenAI endpoint, deployment, and secret key.';
         InvalidJsonErr: Label 'Copilot returned invalid JSON. Please try again.';
         MissingProjectErr: Label 'Copilot response is missing project data. Please try again.';
         MissingTasksErr: Label 'Copilot response is missing tasks. Please try again.';

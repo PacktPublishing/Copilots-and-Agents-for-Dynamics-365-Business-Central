@@ -27,18 +27,15 @@ codeunit 50303 "Plan Event Impl"
     local procedure SetAzureOpenAIAuthorization(var AzureOpenAI: Codeunit "Azure OpenAI")
     var
         CopilotSetup: Record "Event Copilot Setup";
-        EnvironmentInformation: Codeunit "Environment Information";
         AOAIDeployments: Codeunit "AOAI Deployments";
     begin
-        if not EnvironmentInformation.IsSaaSInfrastructure() then begin
-            if not CopilotSetup.Get() then
-                Error(SetupMissingErr);
+        if CopilotSetup.IsConfigured() then
             AzureOpenAI.SetAuthorization(
                 Enum::"AOAI Model Type"::"Chat Completions",
                 CopilotSetup.GetEndpoint(),
                 CopilotSetup.GetDeployment(),
-                CopilotSetup.GetSecretKey());
-        end else
+                CopilotSetup.GetSecretKey())
+        else
             AzureOpenAI.SetManagedResourceAuthorization(
                 Enum::"AOAI Model Type"::"Chat Completions",
                 AOAIDeployments.GetGPT41Latest());
@@ -54,7 +51,4 @@ Output a clear list of steps or tasks in plain text. Use numbered or bullet poin
 Focus on how to plan and organize the event. Decline unrelated questions.';
         exit(SystemPrompt);
     end;
-
-    var
-        SetupMissingErr: Label 'Event Copilot Setup is missing. Open Event Copilot Setup and enter Azure OpenAI endpoint, deployment, and secret key.';
 }

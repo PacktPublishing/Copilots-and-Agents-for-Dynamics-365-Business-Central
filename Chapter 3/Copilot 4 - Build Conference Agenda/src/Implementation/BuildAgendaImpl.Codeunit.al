@@ -49,18 +49,15 @@ codeunit 50609 "Build Agenda Impl"
     local procedure SetAzureOpenAIAuthorization(var AzureOpenAI: Codeunit "Azure OpenAI")
     var
         CopilotSetup: Record "Event Copilot Setup";
-        EnvironmentInformation: Codeunit "Environment Information";
         AOAIDeployments: Codeunit "AOAI Deployments";
     begin
-        if not EnvironmentInformation.IsSaaSInfrastructure() then begin
-            if not CopilotSetup.Get() then
-                Error(SetupMissingErr);
+        if CopilotSetup.IsConfigured() then
             AzureOpenAI.SetAuthorization(
                 Enum::"AOAI Model Type"::"Chat Completions",
                 CopilotSetup.GetEndpoint(),
                 CopilotSetup.GetDeployment(),
-                CopilotSetup.GetSecretKey());
-        end else
+                CopilotSetup.GetSecretKey())
+        else
             AzureOpenAI.SetManagedResourceAuthorization(
                 Enum::"AOAI Model Type"::"Chat Completions",
                 AOAIDeployments.GetGPT41Latest());
@@ -119,7 +116,4 @@ Always use the tools provided. Do not invent session data or time constraints.
         ';
         exit(SystemMessage);
     end;
-
-    var
-        SetupMissingErr: Label 'Event Copilot Setup is missing. Open Event Copilot Setup and enter the Azure OpenAI endpoint, deployment, and secret key.';
 }
