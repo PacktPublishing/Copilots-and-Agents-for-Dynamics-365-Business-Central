@@ -2,7 +2,7 @@ pageextension 50213 "Event Sessions Job List Ext" extends "Job List"
 {
     actions
     {
-        addfirst(navigation)
+        addfirst("&Job")
         {
             action(EventSessions)
             {
@@ -14,7 +14,7 @@ pageextension 50213 "Event Sessions Job List Ext" extends "Job List"
                 RunPageLink = "Project Code" = field("No.");
             }
         }
-        addlast(Category_Category5)
+        addfirst(Category_Category5)
         {
             actionref(EventSessions_Promoted; EventSessions)
             {
