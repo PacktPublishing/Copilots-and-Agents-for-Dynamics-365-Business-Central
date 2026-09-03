@@ -201,11 +201,11 @@ codeunit 50827 "Contoso Room Demo Data"
         DayTwo := DMY2Date(14, 6, 2024);
 
         InitHistorySession(EventSession, 'T24-AI1', DayOne, 090000T, 'TECH2024');
-        CreateHistorySession(EventSession, 110, 147, 'ROOM-101');
+        CreateHistorySession(EventSession, 110, 105, 'ROOM-101');
         InitHistorySession(EventSession, 'T24-FIN1', DayOne, 090000T, 'TECH2024');
         CreateHistorySession(EventSession, 50, 35, 'ROOM-102');
         InitHistorySession(EventSession, 'T24-DEV1', DayOne, 090000T, 'TECH2024');
-        CreateHistorySession(EventSession, 80, 56, 'ROOM-101');
+        CreateHistorySession(EventSession, 80, 56, 'HALL-B');
 
         InitHistorySession(EventSession, 'T24-KEY', DayOne, 103000T, 'TECH2024');
         CreateHistorySession(EventSession, 400, 350, 'HALL-A');
@@ -224,7 +224,7 @@ codeunit 50827 "Contoso Room Demo Data"
         InitHistorySession(EventSession, 'T24-DEV2', DayOne, 143000T, 'TECH2024');
         CreateHistorySession(EventSession, 70, 35, 'ROOM-101');
         InitHistorySession(EventSession, 'T24-OPS2', DayOne, 143000T, 'TECH2024');
-        CreateHistorySession(EventSession, 70, 35, 'ROOM-201');
+        CreateHistorySession(EventSession, 60, 30, 'ROOM-201');
 
         InitHistorySession(EventSession, 'T24-AI4', DayTwo, 090000T, 'TECH2024');
         CreateHistorySession(EventSession, 220, 154, 'HALL-B');
@@ -233,7 +233,7 @@ codeunit 50827 "Contoso Room Demo Data"
         InitHistorySession(EventSession, 'T24-KEY2', DayTwo, 130000T, 'TECH2024');
         CreateHistorySession(EventSession, 400, 360, 'HALL-A');
         InitHistorySession(EventSession, 'T24-FIN3', DayTwo, 143000T, 'TECH2024');
-        CreateHistorySession(EventSession, 80, 40, 'ROOM-102');
+        CreateHistorySession(EventSession, 80, 40, 'ROOM-101');
     end;
 
     local procedure CreateHistory2025()
@@ -246,11 +246,11 @@ codeunit 50827 "Contoso Room Demo Data"
         DayTwo := DMY2Date(13, 6, 2025);
 
         InitHistorySession(EventSession, 'T25-AI1', DayOne, 090000T, 'TECH2025');
-        CreateHistorySession(EventSession, 115, 152, 'ROOM-101');
+        CreateHistorySession(EventSession, 115, 112, 'ROOM-101');
         InitHistorySession(EventSession, 'T25-FIN1', DayOne, 090000T, 'TECH2025');
         CreateHistorySession(EventSession, 52, 37, 'ROOM-102');
         InitHistorySession(EventSession, 'T25-DEV1', DayOne, 090000T, 'TECH2025');
-        CreateHistorySession(EventSession, 85, 60, 'ROOM-101');
+        CreateHistorySession(EventSession, 85, 60, 'HALL-B');
 
         InitHistorySession(EventSession, 'T25-KEY', DayOne, 103000T, 'TECH2025');
         CreateHistorySession(EventSession, 400, 380, 'HALL-A');
@@ -262,14 +262,14 @@ codeunit 50827 "Contoso Room Demo Data"
         InitHistorySession(EventSession, 'T25-AI3', DayOne, 130000T, 'TECH2025');
         CreateHistorySession(EventSession, 250, 155, 'HALL-B');
         InitHistorySession(EventSession, 'T25-FIN2', DayOne, 130000T, 'TECH2025');
-        CreateHistorySession(EventSession, 65, 41, 'ROOM-102');
+        CreateHistorySession(EventSession, 60, 36, 'ROOM-102');
         InitHistorySession(EventSession, 'T25-LAB', DayOne, 130000T, 'TECH2025');
-        CreateHistorySession(EventSession, 32, 19, 'LAB');
+        CreateHistorySession(EventSession, 30, 18, 'LAB');
 
         InitHistorySession(EventSession, 'T25-DEV2', DayOne, 143000T, 'TECH2025');
         CreateHistorySession(EventSession, 72, 36, 'ROOM-101');
         InitHistorySession(EventSession, 'T25-OPS2', DayOne, 143000T, 'TECH2025');
-        CreateHistorySession(EventSession, 72, 36, 'ROOM-201');
+        CreateHistorySession(EventSession, 60, 30, 'ROOM-201');
 
         InitHistorySession(EventSession, 'T25-AI4', DayTwo, 090000T, 'TECH2025');
         CreateHistorySession(EventSession, 230, 161, 'HALL-B');
@@ -278,7 +278,7 @@ codeunit 50827 "Contoso Room Demo Data"
         InitHistorySession(EventSession, 'T25-KEY2', DayTwo, 130000T, 'TECH2025');
         CreateHistorySession(EventSession, 400, 370, 'HALL-A');
         InitHistorySession(EventSession, 'T25-FIN3', DayTwo, 143000T, 'TECH2025');
-        CreateHistorySession(EventSession, 82, 41, 'ROOM-102');
+        CreateHistorySession(EventSession, 82, 41, 'ROOM-101');
     end;
 
     local procedure CreateHistory2026()
@@ -291,11 +291,11 @@ codeunit 50827 "Contoso Room Demo Data"
         DayTwo := DMY2Date(12, 6, 2026);
 
         InitHistorySession(EventSession, 'T26-AI1', DayOne, 090000T, 'TECH2026');
-        CreateHistorySession(EventSession, 120, 158, 'ROOM-101');
+        CreateHistorySession(EventSession, 120, 118, 'ROOM-101');
         InitHistorySession(EventSession, 'T26-FIN1', DayOne, 090000T, 'TECH2026');
         CreateHistorySession(EventSession, 54, 38, 'ROOM-102');
         InitHistorySession(EventSession, 'T26-DEV1', DayOne, 090000T, 'TECH2026');
-        CreateHistorySession(EventSession, 88, 62, 'ROOM-101');
+        CreateHistorySession(EventSession, 88, 62, 'HALL-B');
 
         InitHistorySession(EventSession, 'T26-KEY', DayOne, 103000T, 'TECH2026');
         CreateHistorySession(EventSession, 400, 375, 'HALL-A');
@@ -305,16 +305,16 @@ codeunit 50827 "Contoso Room Demo Data"
         CreateHistorySession(EventSession, 98, 70, 'ROOM-101');
 
         InitHistorySession(EventSession, 'T26-AI3', DayOne, 130000T, 'TECH2026');
-        CreateHistorySession(EventSession, 255, 158, 'HALL-B');
+        CreateHistorySession(EventSession, 250, 150, 'HALL-B');
         InitHistorySession(EventSession, 'T26-FIN2', DayOne, 130000T, 'TECH2026');
-        CreateHistorySession(EventSession, 68, 42, 'ROOM-102');
+        CreateHistorySession(EventSession, 60, 36, 'ROOM-102');
         InitHistorySession(EventSession, 'T26-LAB', DayOne, 130000T, 'TECH2026');
-        CreateHistorySession(EventSession, 34, 21, 'LAB');
+        CreateHistorySession(EventSession, 30, 18, 'LAB');
 
         InitHistorySession(EventSession, 'T26-DEV2', DayOne, 143000T, 'TECH2026');
         CreateHistorySession(EventSession, 74, 37, 'ROOM-101');
         InitHistorySession(EventSession, 'T26-OPS2', DayOne, 143000T, 'TECH2026');
-        CreateHistorySession(EventSession, 74, 37, 'ROOM-201');
+        CreateHistorySession(EventSession, 60, 30, 'ROOM-201');
 
         InitHistorySession(EventSession, 'T26-AI4', DayTwo, 090000T, 'TECH2026');
         CreateHistorySession(EventSession, 235, 164, 'HALL-B');
@@ -323,7 +323,7 @@ codeunit 50827 "Contoso Room Demo Data"
         InitHistorySession(EventSession, 'T26-KEY2', DayTwo, 130000T, 'TECH2026');
         CreateHistorySession(EventSession, 400, 372, 'HALL-A');
         InitHistorySession(EventSession, 'T26-FIN3', DayTwo, 143000T, 'TECH2026');
-        CreateHistorySession(EventSession, 84, 42, 'ROOM-102');
+        CreateHistorySession(EventSession, 84, 42, 'ROOM-101');
     end;
 
     local procedure CreateScheduled2027()

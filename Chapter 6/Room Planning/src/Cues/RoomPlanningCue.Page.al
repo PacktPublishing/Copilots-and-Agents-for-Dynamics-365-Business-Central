@@ -16,16 +16,16 @@ page 50816 "Room Planning Cue"
                 {
                     ApplicationArea = All;
                     DrillDownPageId = "Event Sessions";
-                    ToolTip = 'Specifies how many scheduled sessions on or after the work date have no room yet.';
+                    ToolTip = 'Specifies how many scheduled sessions for this event, on or after the work date, have no room yet.';
                 }
                 field("Over Capacity Sessions"; Rec."Over Capacity Sessions")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies how many future scheduled sessions have more reserved attendees than the assigned room can seat.';
+                    ToolTip = 'Specifies how many future scheduled sessions for this event have more reserved attendees than the assigned room can seat.';
 
                     trigger OnDrillDown()
                     begin
-                        Page.Run(Page::"Event Sessions");
+                        Rec.DrillDownOverCapacitySessions();
                     end;
                 }
             }

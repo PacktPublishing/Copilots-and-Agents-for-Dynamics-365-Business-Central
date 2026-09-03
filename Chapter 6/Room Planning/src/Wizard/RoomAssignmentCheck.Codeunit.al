@@ -1,15 +1,20 @@
 codeunit 50821 "Room Assignment Check"
 {
-    procedure CheckRoomAvailability(var RoomAssignmentBuffer: Record "Room Assignment Buffer")
+    /// <summary>
+    /// Checks one wizard row against the rooms, the other wizard rows, and the stored sessions.
+    /// The row that is passed in is never filtered or repositioned, so the wizard can call this
+    /// from OnValidate without losing the record the user is editing.
+    /// </summary>
+    procedure CheckRoomAvailability(var FromRoomAssignmentBuffer: Record "Room Assignment Buffer")
     var
         Room: Record Room;
         BlockedReason: Text;
     begin
-        if RoomAssignmentBuffer."Room Code" = '' then
+        if FromRoomAssignmentBuffer."Room Code" = '' then
             exit;
 
-        if not Room.Get(RoomAssignmentBuffer."Room Code") then
-            Error(RoomDoesNotExistErr, RoomAssignmentBuffer."Room Code");
+        if not Room.Get(FromRoomAssignmentBuffer."Room Code") then
+            Error(RoomDoesNotExistErr, FromRoomAssignmentBuffer."Room Code");
 
         if Room.Blocked then begin
             BlockedReason := Room."Blocked Reason";
@@ -18,48 +23,54 @@ codeunit 50821 "Room Assignment Check"
             Error(BlockedErr, Room."Code", BlockedReason);
         end;
 
-        if RoomAssignmentBuffer."Estimated Attendees" <= 0 then
-            Error(NoEstimateErr, RoomAssignmentBuffer."Session Code");
+        if FromRoomAssignmentBuffer."Estimated Attendees" <= 0 then
+            Error(NoEstimateErr, FromRoomAssignmentBuffer."Session Code");
 
-        if RoomAssignmentBuffer."Estimated Attendees" > Room.Capacity then
-            Error(CapacityEstimateErr, Room."Code", Room.Capacity, RoomAssignmentBuffer."Session Code", RoomAssignmentBuffer."Estimated Attendees");
+        if FromRoomAssignmentBuffer."Estimated Attendees" > Room.Capacity then
+            Error(CapacityEstimateErr, Room."Code", Room.Capacity, FromRoomAssignmentBuffer."Session Code", FromRoomAssignmentBuffer."Estimated Attendees");
 
-        if (RoomAssignmentBuffer."Reserved Attendees" > 0) and (RoomAssignmentBuffer."Reserved Attendees" > Room.Capacity) then
-            Error(CapacityReservedErr, Room."Code", Room.Capacity, RoomAssignmentBuffer."Session Code", RoomAssignmentBuffer."Reserved Attendees");
+        if (FromRoomAssignmentBuffer."Reserved Attendees" > 0) and (FromRoomAssignmentBuffer."Reserved Attendees" > Room.Capacity) then
+            Error(CapacityReservedErr, Room."Code", Room.Capacity, FromRoomAssignmentBuffer."Session Code", FromRoomAssignmentBuffer."Reserved Attendees");
 
-        CheckBufferDoubleBooking(RoomAssignmentBuffer, Room."Code");
-        CheckSessionDoubleBooking(RoomAssignmentBuffer, Room."Code");
+        CheckDoubleBookingInWizard(FromRoomAssignmentBuffer, Room."Code");
+        CheckDoubleBookingOnSessions(FromRoomAssignmentBuffer, Room."Code");
     end;
 
-    local procedure CheckBufferDoubleBooking(var RoomAssignmentBuffer: Record "Room Assignment Buffer"; RoomCode: Code[20])
+    local procedure CheckDoubleBookingInWizard(var FromRoomAssignmentBuffer: Record "Room Assignment Buffer"; RoomCode: Code[20])
     var
-        OtherBuffer: Record "Room Assignment Buffer";
+        RoomAssignmentBuffer: Record "Room Assignment Buffer";
     begin
-        OtherBuffer.Copy(RoomAssignmentBuffer, true);
-        OtherBuffer.SetFilter("Session Code", '<>%1', RoomAssignmentBuffer."Session Code");
-        OtherBuffer.SetRange("Room Code", RoomCode);
-        OtherBuffer.SetRange("Date", RoomAssignmentBuffer.Date);
-        OtherBuffer.SetRange(Status, OtherBuffer.Status::Scheduled);
-        if OtherBuffer.FindSet() then
+        // Share the wizard's temporary table, then filter the copy. Filters and position are per
+        // record variable, so the row being validated stays where the user left it.
+        RoomAssignmentBuffer.Copy(FromRoomAssignmentBuffer, true);
+        RoomAssignmentBuffer.Reset();
+        RoomAssignmentBuffer.SetFilter("Session Code", '<>%1', FromRoomAssignmentBuffer."Session Code");
+        RoomAssignmentBuffer.SetRange("Room Code", RoomCode);
+        RoomAssignmentBuffer.SetRange("Date", FromRoomAssignmentBuffer.Date);
+        RoomAssignmentBuffer.SetRange(Status, RoomAssignmentBuffer.Status::Scheduled);
+        if RoomAssignmentBuffer.FindSet() then
             repeat
-                if TimesOverlap(RoomAssignmentBuffer."Start Time", RoomAssignmentBuffer."End Time", OtherBuffer."Start Time", OtherBuffer."End Time") then
-                    Error(DoubleBookErr, RoomCode, OtherBuffer."Session Code", OtherBuffer."Start Time", OtherBuffer."End Time");
-            until OtherBuffer.Next() = 0;
+                if TimesOverlap(FromRoomAssignmentBuffer."Start Time", FromRoomAssignmentBuffer."End Time", RoomAssignmentBuffer."Start Time", RoomAssignmentBuffer."End Time") then
+                    Error(DoubleBookErr, RoomCode, RoomAssignmentBuffer."Session Code", RoomAssignmentBuffer."Start Time", RoomAssignmentBuffer."End Time");
+            until RoomAssignmentBuffer.Next() = 0;
     end;
 
-    local procedure CheckSessionDoubleBooking(var RoomAssignmentBuffer: Record "Room Assignment Buffer"; RoomCode: Code[20])
+    local procedure CheckDoubleBookingOnSessions(var FromRoomAssignmentBuffer: Record "Room Assignment Buffer"; RoomCode: Code[20])
     var
         EventSession: Record "Event Session";
-        BufferLookup: Record "Room Assignment Buffer";
+        RoomAssignmentBuffer: Record "Room Assignment Buffer";
     begin
+        RoomAssignmentBuffer.Copy(FromRoomAssignmentBuffer, true);
+        RoomAssignmentBuffer.Reset();
+
         EventSession.SetRange("Room Code", RoomCode);
         EventSession.SetRange(Status, EventSession.Status::Scheduled);
-        EventSession.SetRange("Date", RoomAssignmentBuffer.Date);
+        EventSession.SetRange("Date", FromRoomAssignmentBuffer.Date);
         if EventSession.FindSet() then
             repeat
-                BufferLookup.Copy(RoomAssignmentBuffer, true);
-                if not BufferLookup.Get(EventSession."Code") then
-                    if TimesOverlap(RoomAssignmentBuffer."Start Time", RoomAssignmentBuffer."End Time", EventSession."Start Time", EventSession."End Time") then
+                // Sessions the wizard holds are judged on their wizard row, not on the stored room.
+                if not RoomAssignmentBuffer.Get(EventSession."Code") then
+                    if TimesOverlap(FromRoomAssignmentBuffer."Start Time", FromRoomAssignmentBuffer."End Time", EventSession."Start Time", EventSession."End Time") then
                         Error(DoubleBookErr, RoomCode, EventSession."Code", EventSession."Start Time", EventSession."End Time");
             until EventSession.Next() = 0;
     end;

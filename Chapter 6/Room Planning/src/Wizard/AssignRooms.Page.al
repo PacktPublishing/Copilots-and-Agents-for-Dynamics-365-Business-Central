@@ -124,7 +124,7 @@ page 50810 "Assign Rooms"
     var
         AssignRoomsMgt: Codeunit "Assign Rooms Mgt";
     begin
-        AssignRoomsMgt.Load(Rec);
+        AssignRoomsMgt.Load(Rec, ProjectCode);
         if Rec.FindFirst() then;
     end;
 
@@ -133,6 +133,12 @@ page 50810 "Assign Rooms"
         SessionStyle := Rec.GetAttendeeDemandStyle();
     end;
 
+    procedure SetProjectCode(NewProjectCode: Code[20])
+    begin
+        ProjectCode := NewProjectCode;
+    end;
+
     var
+        ProjectCode: Code[20];
         SessionStyle: Text;
 }

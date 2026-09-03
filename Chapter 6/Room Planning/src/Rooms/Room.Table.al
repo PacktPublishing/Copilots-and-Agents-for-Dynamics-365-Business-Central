@@ -54,4 +54,11 @@ table 50800 Room
             Clustered = true;
         }
     }
+
+    fieldgroups
+    {
+        fieldgroup(DropDown; "Code", Name, Capacity)
+        {
+        }
+    }
 }

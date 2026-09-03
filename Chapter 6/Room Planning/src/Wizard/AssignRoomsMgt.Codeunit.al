@@ -1,12 +1,13 @@
 codeunit 50822 "Assign Rooms Mgt"
 {
-    procedure Load(var RoomAssignmentBuffer: Record "Room Assignment Buffer")
+    procedure Load(var RoomAssignmentBuffer: Record "Room Assignment Buffer"; ProjectCode: Code[20])
     var
         EventSession: Record "Event Session";
     begin
         RoomAssignmentBuffer.Reset();
         RoomAssignmentBuffer.DeleteAll();
 
+        SetThisEventFilter(EventSession, ProjectCode);
         EventSession.SetRange(Status, EventSession.Status::Scheduled);
         EventSession.SetFilter("Date", '%1..', WorkDate());
         if EventSession.FindSet() then
@@ -15,8 +16,10 @@ codeunit 50822 "Assign Rooms Mgt"
             until EventSession.Next() = 0;
 
         EventSession.Reset();
+        SetThisEventFilter(EventSession, ProjectCode);
         EventSession.SetRange(Status, EventSession.Status::Cancelled);
         EventSession.SetFilter("Room Code", '<>%1', '');
+        EventSession.SetFilter("Date", '%1..', WorkDate());
         if EventSession.FindSet() then
             repeat
                 if not RoomAssignmentBuffer.Get(EventSession."Code") then
@@ -43,8 +46,12 @@ codeunit 50822 "Assign Rooms Mgt"
         exit(Confirm(ApplyRoomChangesQst));
     end;
 
-    local procedure ApplyRoomChanges(var RoomAssignmentBuffer: Record "Room Assignment Buffer")
+    local procedure ApplyRoomChanges(var RoomAssignmentBufferOnPage: Record "Room Assignment Buffer")
+    var
+        RoomAssignmentBuffer: Record "Room Assignment Buffer";
     begin
+        // Walk a shared copy so the wizard page keeps its own filters, sorting and position.
+        RoomAssignmentBuffer.Copy(RoomAssignmentBufferOnPage, true);
         RoomAssignmentBuffer.Reset();
         if RoomAssignmentBuffer.FindSet() then
             repeat
@@ -80,6 +87,12 @@ codeunit 50822 "Assign Rooms Mgt"
         RoomAssignmentCheck.CheckRoomAvailability(RoomAssignmentBuffer);
         EventSession.Validate("Room Code", RoomAssignmentBuffer."Room Code");
         EventSession.Modify(true);
+    end;
+
+    local procedure SetThisEventFilter(var EventSession: Record "Event Session"; ProjectCode: Code[20])
+    begin
+        if ProjectCode <> '' then
+            EventSession.SetRange("Project Code", ProjectCode);
     end;
 
     local procedure InsertBufferRow(var RoomAssignmentBuffer: Record "Room Assignment Buffer"; EventSession: Record "Event Session")

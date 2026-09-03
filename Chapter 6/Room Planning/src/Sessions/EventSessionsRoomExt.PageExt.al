@@ -69,6 +69,7 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
             part(RoomPlanningCue; "Room Planning Cue")
             {
                 ApplicationArea = All;
+                SubPageLink = "Project Code Filter" = field("Project Code");
             }
         }
     }
@@ -82,8 +83,15 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
                 ApplicationArea = All;
                 Caption = 'Assign Rooms';
                 Image = Allocations;
-                RunObject = Page "Assign Rooms";
                 ToolTip = 'Opens a temporary list of upcoming sessions so you can assign or move rooms. This is the only place rooms are assigned. Changes are not saved until you finish.';
+
+                trigger OnAction()
+                var
+                    AssignRooms: Page "Assign Rooms";
+                begin
+                    AssignRooms.SetProjectCode(Rec."Project Code");
+                    AssignRooms.RunModal();
+                end;
             }
             action(Room)
             {
