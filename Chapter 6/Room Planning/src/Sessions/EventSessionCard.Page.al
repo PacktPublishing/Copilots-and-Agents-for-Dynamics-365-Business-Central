@@ -150,6 +150,18 @@ page 50813 "Event Session Card"
                     AssignRooms.RunModal();
                 end;
             }
+            action(FindSimilar)
+            {
+                ApplicationArea = All;
+                Caption = 'Find Similar';
+                Image = Find;
+                ToolTip = 'Ranks other sessions by meaning of name, description, and speakers using semantic search.';
+
+                trigger OnAction()
+                begin
+                    FindAndShowSimilarSessions();
+                end;
+            }
         }
         area(Navigation)
         {
@@ -178,6 +190,9 @@ page 50813 "Event Session Card"
             actionref(AssignRooms_Promoted; AssignRooms)
             {
             }
+            actionref(FindSimilar_Promoted; FindSimilar)
+            {
+            }
             actionref(SessionAttendeeReservations_Promoted; SessionAttendeeReservations)
             {
             }
@@ -197,6 +212,22 @@ page 50813 "Event Session Card"
         SessionStyle := Rec.GetAttendeeDemandStyle();
     end;
 
+    local procedure FindAndShowSimilarSessions()
+    var
+        SimilarSessionBuffer: Record "Similar Session Buffer" temporary;
+        FindSimilarSessions: Codeunit "Find Similar Sessions";
+        SimilarEventSessions: Page "Similar Event Sessions";
+    begin
+        FindSimilarSessions.FindSimilar(Rec, SimilarSessionBuffer);
+        if SimilarSessionBuffer.IsEmpty() then begin
+            Message(NoSimilarSessionsMsg);
+            exit;
+        end;
+        SimilarEventSessions.SetBuffer(SimilarSessionBuffer);
+        SimilarEventSessions.Run();
+    end;
+
     var
         SessionStyle: Text;
+        NoSimilarSessionsMsg: Label 'No similar sessions were found.';
 }
