@@ -1,7 +1,7 @@
-page 50818 "Room Planning Demo Data"
+page 50818 "Event Demo Data"
 {
     ApplicationArea = All;
-    Caption = 'Room Planning Demo Data';
+    Caption = 'Event Demo Data';
     Editable = false;
     PageType = Card;
     UsageCategory = Tasks;
@@ -12,8 +12,8 @@ page 50818 "Room Planning Demo Data"
         {
             group(Instructional)
             {
-                Caption = 'Contoso BC Tech Summit';
-                InstructionalText = 'Creates the Contoso BC Tech Summit venue in Amsterdam, 11-12 June 2027. Set the work date to a day before 11 June 2027 before you plan rooms. Run the actions in order: venue and schedule first (past conferences include reservations; 2027 rooms and reservations stay empty), then 2027 reservations, then cancel a session, then day-one actuals.';
+                Caption = 'Cronus BC Tech Summit';
+                InstructionalText = 'Creates the Cronus BC Tech Summit venue in Amsterdam, 11-12 June 2027. Set the work date to a day before 11 June 2027 before you plan rooms. Run the actions in order: venue and schedule first (past conferences include reservations; 2027 rooms and reservations stay empty), then 2027 reservations, then cancel a session, then day-one actuals.';
             }
         }
     }
@@ -31,9 +31,9 @@ page 50818 "Room Planning Demo Data"
 
                 trigger OnAction()
                 var
-                    ContosoRoomDemoData: Codeunit "Contoso Room Demo Data";
+                    CronusRoomDemoData: Codeunit "Event Demo Data";
                 begin
-                    ContosoRoomDemoData.GenerateVenueAndSchedule();
+                    CronusRoomDemoData.GenerateVenueAndSchedule();
                     Message(VenueReadyMsg);
                 end;
             }
@@ -46,9 +46,9 @@ page 50818 "Room Planning Demo Data"
 
                 trigger OnAction()
                 var
-                    ContosoRoomDemoData: Codeunit "Contoso Room Demo Data";
+                    CronusRoomDemoData: Codeunit "Event Demo Data";
                 begin
-                    ContosoRoomDemoData.GenerateReservations();
+                    CronusRoomDemoData.GenerateReservations();
                     Message(ReservationsReadyMsg);
                 end;
             }
@@ -61,9 +61,9 @@ page 50818 "Room Planning Demo Data"
 
                 trigger OnAction()
                 var
-                    ContosoRoomDemoData: Codeunit "Contoso Room Demo Data";
+                    CronusRoomDemoData: Codeunit "Event Demo Data";
                 begin
-                    ContosoRoomDemoData.CancelKeynoteSession();
+                    CronusRoomDemoData.CancelKeynoteSession();
                     Message(KeynoteCancelledMsg);
                 end;
             }
@@ -76,9 +76,9 @@ page 50818 "Room Planning Demo Data"
 
                 trigger OnAction()
                 var
-                    ContosoRoomDemoData: Codeunit "Contoso Room Demo Data";
+                    CronusRoomDemoData: Codeunit "Event Demo Data";
                 begin
-                    ContosoRoomDemoData.FillDayOneActuals();
+                    CronusRoomDemoData.FillDayOneActuals();
                     Message(ActualsReadyMsg);
                 end;
             }
@@ -91,11 +91,11 @@ page 50818 "Room Planning Demo Data"
 
                 trigger OnAction()
                 var
-                    ContosoRoomDemoData: Codeunit "Contoso Room Demo Data";
+                    CronusRoomDemoData: Codeunit "Event Demo Data";
                 begin
                     if not Confirm(CleanDemoDataQst) then
                         exit;
-                    ContosoRoomDemoData.DeleteDemoData();
+                    CronusRoomDemoData.DeleteDemoData();
                     Message(DemoDataDeletedMsg);
                 end;
             }

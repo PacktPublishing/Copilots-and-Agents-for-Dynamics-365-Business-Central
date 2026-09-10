@@ -67,7 +67,7 @@ codeunit 50823 "Find Similar Sessions"
     begin
         SimilarSessionBuffer.Init();
         SimilarSessionBuffer.Rank := SimilarityResult."No.";
-        SimilarSessionBuffer.Similarity := SimilarityResult.Similarity;
+        SimilarSessionBuffer.Similarity := Round(SimilarityResult.Similarity, 0.01);
         SimilarSessionBuffer.Code := EventSession.Code;
         SimilarSessionBuffer.Name := EventSession.Name;
         SimilarSessionBuffer.Description := EventSession.Description;

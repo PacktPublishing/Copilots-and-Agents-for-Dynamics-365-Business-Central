@@ -19,6 +19,6 @@ permissionset 50841 "Room Planning Admin"
         page "Room Planning Cue" = X,
         page "Assign Rooms" = X,
         page "Similar Event Sessions" = X,
-        page "Room Planning Demo Data" = X,
+        page "Event Demo Data" = X,
         page "Event Sessions" = X;
 }

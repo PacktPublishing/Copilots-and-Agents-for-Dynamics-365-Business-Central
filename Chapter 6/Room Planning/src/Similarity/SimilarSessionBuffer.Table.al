@@ -15,7 +15,7 @@ table 50804 "Similar Session Buffer"
         {
             AutoFormatType = 0;
             Caption = 'Similarity';
-            DecimalPlaces = 0 : 5;
+            DecimalPlaces = 2 : 2;
             ToolTip = 'Specifies the relative similarity score for this result set. Higher is closer.';
         }
         field(3; "Code"; Code[20])

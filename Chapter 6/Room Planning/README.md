@@ -11,7 +11,7 @@ Stage app for **Chapter 6: Custom Agents**. Rooms, attendee figures, and the **A
 - **Assign Rooms** (page 50810, codeunit **Assign Rooms Mgt** 50822, buffer 50803): the only place a room is assigned. Temporary list, scoped to the event you opened it from; **Finish** writes `Event Session`.`Room Code`.
 - **Room Assignment Check** (codeunit 50821): capacity, blocked, and double-booking. Called from the wizard buffer and from **Finish**. No `Confirm`.
 - **Room Planning Cue** (table 50807, page 50816): sessions without a room, and future sessions over capacity. On **Event Sessions** it follows the **Project Code** of the selected row.
-- **Contoso Room Demo Data** (codeunit 50827, page 50818): phased generators — venue and schedule, reservations, cancel a session, fill day-one actuals. Never on install.
+- **Cronus Room Demo Data** (codeunit 50827, page 50818): phased generators — venue and schedule, reservations, cancel a session, fill day-one actuals. Never on install.
 - **Room Planning - Admin** (permission set 50841).
 
 
