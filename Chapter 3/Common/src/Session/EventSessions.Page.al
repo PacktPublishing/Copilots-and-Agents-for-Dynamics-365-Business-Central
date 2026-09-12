@@ -2,6 +2,7 @@ page 50212 "Event Sessions"
 {
     ApplicationArea = All;
     Caption = 'Event Sessions';
+    DataCaptionFields = "Project Code";
     PageType = List;
     SourceTable = "Event Session";
     UsageCategory = Lists;
