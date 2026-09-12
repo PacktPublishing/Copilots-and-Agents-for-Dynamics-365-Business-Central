@@ -1,6 +1,7 @@
 table 50211 "Event Session"
 {
     Caption = 'Event Session';
+    DataCaptionFields = "Code", Name;
     DataClassification = CustomerContent;
 
     fields
