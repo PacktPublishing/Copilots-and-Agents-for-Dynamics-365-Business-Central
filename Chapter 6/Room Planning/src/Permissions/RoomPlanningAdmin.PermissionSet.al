@@ -11,6 +11,7 @@ permissionset 50841 "Room Planning Admin"
         tabledata "Event Session" = RIMD,
         tabledata Job = RID,
         codeunit "Find Similar Sessions" = X,
+        page "Job List" = X,
         page "Room List" = X,
         page "Room Card" = X,
         page "Session Attendee Res. Entries" = X,
