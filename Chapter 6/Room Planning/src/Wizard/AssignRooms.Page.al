@@ -16,7 +16,7 @@ page 50810 "Assign Rooms"
             group(Instructional)
             {
                 Caption = 'Assign rooms';
-                InstructionalText = 'Set a room on each upcoming session. A room is too small when its capacity is below the attendees you estimate. Two sessions cannot share a room in the same slot. Changes are not saved until you finish.';
+                InstructionalText = 'Set a room on each session. A room is too small when its capacity is below the attendees you estimate. Two sessions cannot share a room in the same slot. Changes are not saved until you finish.';
                 ShowCaption = false;
             }
             repeater(Sessions)
@@ -113,8 +113,8 @@ page 50810 "Assign Rooms"
                 var
                     AssignRoomsMgt: Codeunit "Assign Rooms Mgt";
                 begin
-                    if AssignRoomsMgt.Finish(Rec) then
-                        CurrPage.Close();
+                    AssignRoomsMgt.Finish(Rec);
+                    CurrPage.Close();
                 end;
             }
         }

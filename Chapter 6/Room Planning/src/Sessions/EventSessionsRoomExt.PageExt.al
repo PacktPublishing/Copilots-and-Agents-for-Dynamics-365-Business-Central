@@ -83,7 +83,7 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
                 ApplicationArea = All;
                 Caption = 'Assign Rooms';
                 Image = Allocations;
-                ToolTip = 'Opens a temporary list of upcoming sessions so you can assign or move rooms. This is the only place rooms are assigned. Changes are not saved until you finish.';
+                ToolTip = 'Opens a temporary list of sessions so you can assign or move rooms. This is the only place rooms are assigned. Changes are not saved until you finish.';
 
                 trigger OnAction()
                 var

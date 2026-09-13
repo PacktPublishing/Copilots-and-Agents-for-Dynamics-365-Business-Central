@@ -9,7 +9,6 @@ codeunit 50822 "Assign Rooms Mgt"
 
         SetThisEventFilter(EventSession, ProjectCode);
         EventSession.SetRange(Status, EventSession.Status::Scheduled);
-        EventSession.SetFilter("Date", '%1..', WorkDate());
         if EventSession.FindSet() then
             repeat
                 InsertBufferRow(RoomAssignmentBuffer, EventSession);
@@ -19,7 +18,6 @@ codeunit 50822 "Assign Rooms Mgt"
         SetThisEventFilter(EventSession, ProjectCode);
         EventSession.SetRange(Status, EventSession.Status::Cancelled);
         EventSession.SetFilter("Room Code", '<>%1', '');
-        EventSession.SetFilter("Date", '%1..', WorkDate());
         if EventSession.FindSet() then
             repeat
                 if not RoomAssignmentBuffer.Get(EventSession."Code") then
@@ -27,23 +25,9 @@ codeunit 50822 "Assign Rooms Mgt"
             until EventSession.Next() = 0;
     end;
 
-    procedure Finish(var RoomAssignmentBuffer: Record "Room Assignment Buffer"): Boolean
+    procedure Finish(var RoomAssignmentBuffer: Record "Room Assignment Buffer")
     begin
-        if not ConfirmFinish() then
-            exit(false);
-
         ApplyRoomChanges(RoomAssignmentBuffer);
-        exit(true);
-    end;
-
-    local procedure ConfirmFinish(): Boolean
-    var
-        IsSkipConfirm: Boolean;
-    begin
-        OnBeforeFinish(IsSkipConfirm);
-        if IsSkipConfirm then
-            exit(true);
-        exit(Confirm(ApplyRoomChangesQst));
     end;
 
     local procedure ApplyRoomChanges(var RoomAssignmentBufferOnPage: Record "Room Assignment Buffer")
@@ -110,13 +94,5 @@ codeunit 50822 "Assign Rooms Mgt"
         RoomAssignmentBuffer."Room Code" := EventSession."Room Code";
         RoomAssignmentBuffer."Original Room Code" := EventSession."Room Code";
         RoomAssignmentBuffer.Insert();
-    end;
-
-    var
-        ApplyRoomChangesQst: Label 'Apply the room changes?';
-
-    [IntegrationEvent(false, false)]
-    procedure OnBeforeFinish(var SkipConfirm: Boolean)
-    begin
     end;
 }
