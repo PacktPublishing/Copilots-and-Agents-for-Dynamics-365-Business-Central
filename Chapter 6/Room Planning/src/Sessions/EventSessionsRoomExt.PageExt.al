@@ -1,7 +1,5 @@
 pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
 {
-    CardPageId = "Event Session Card";
-
     layout
     {
         modify("Code")
@@ -53,9 +51,8 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
             field("Room Code"; Rec."Room Code")
             {
                 ApplicationArea = All;
-                Editable = false;
                 StyleExpr = SessionStyle;
-                ToolTip = 'Specifies the room assigned to this session. You cannot change it here. Use Assign Rooms to assign or move a session.';
+                ToolTip = 'Specifies the room assigned to this session. The room must exist, must not be blocked, must seat the estimated and reserved attendees, and must be free in this time slot.';
             }
             field("Actual Attendees"; Rec."Actual Attendees")
             {
@@ -71,6 +68,11 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
                 ApplicationArea = All;
                 SubPageLink = "Project Code Filter" = field("Project Code");
             }
+            part(SessionAttendeeReservationFactBox; "Session Attendee Res. FactBox")
+            {
+                ApplicationArea = All;
+                SubPageLink = "Session Code" = field("Code");
+            }
         }
     }
 
@@ -78,19 +80,16 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
     {
         addfirst(Processing)
         {
-            action(AssignRooms)
+            action(FindSimilar)
             {
                 ApplicationArea = All;
-                Caption = 'Assign Rooms';
-                Image = Allocations;
-                ToolTip = 'Opens a temporary list of sessions so you can assign or move rooms. This is the only place rooms are assigned. Changes are not saved until you finish.';
+                Caption = 'Find Similar';
+                Image = Find;
+                ToolTip = 'Ranks other sessions by meaning of name, description, and speakers using semantic search.';
 
                 trigger OnAction()
-                var
-                    AssignRooms: Page "Assign Rooms";
                 begin
-                    AssignRooms.SetProjectCode(Rec."Project Code");
-                    AssignRooms.RunModal();
+                    FindAndShowSimilarSessions();
                 end;
             }
             action(Room)
@@ -104,12 +103,27 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
                 ToolTip = 'Open the card for the room assigned to this session.';
             }
         }
+        addlast(Navigation)
+        {
+            action(SessionAttendeeReservations)
+            {
+                ApplicationArea = All;
+                Caption = 'Attendee Reservations';
+                Image = LedgerEntries;
+                RunObject = Page "Session Attendee Res. Entries";
+                RunPageLink = "Session Code" = field("Code");
+                ToolTip = 'View attendee reservations from the conference app for this session.';
+            }
+        }
         addfirst(Promoted)
         {
-            actionref(AssignRooms_Promoted; AssignRooms)
+            actionref(FindSimilar_Promoted; FindSimilar)
             {
             }
             actionref(Room_Promoted; Room)
+            {
+            }
+            actionref(SessionAttendeeReservations_Promoted; SessionAttendeeReservations)
             {
             }
         }
@@ -125,6 +139,22 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
         SessionStyle := Rec.GetAttendeeDemandStyle();
     end;
 
+    local procedure FindAndShowSimilarSessions()
+    var
+        SimilarSessionBuffer: Record "Similar Session Buffer" temporary;
+        FindSimilarSessions: Codeunit "Find Similar Sessions";
+        SimilarEventSessions: Page "Similar Event Sessions";
+    begin
+        FindSimilarSessions.FindSimilar(Rec, SimilarSessionBuffer);
+        if SimilarSessionBuffer.IsEmpty() then begin
+            Message(NoSimilarSessionsMsg);
+            exit;
+        end;
+        SimilarEventSessions.SetBuffer(SimilarSessionBuffer);
+        SimilarEventSessions.Run();
+    end;
+
     var
         SessionStyle: Text;
+        NoSimilarSessionsMsg: Label 'No similar sessions were found.';
 }

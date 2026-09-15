@@ -57,7 +57,7 @@ page 50818 "Event Demo Data"
                 ApplicationArea = All;
                 Caption = 'Cancel a session';
                 Image = Cancel;
-                ToolTip = 'Cancels the opening keynote T27-KEY. The room on that session is left as it is so Assign Rooms can release it.';
+                ToolTip = 'Cancels the opening keynote T27-KEY. The room on that session is left as it is so you can clear it on Event Sessions.';
 
                 trigger OnAction()
                 var

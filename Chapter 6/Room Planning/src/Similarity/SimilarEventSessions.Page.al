@@ -32,10 +32,6 @@ page 50819 "Similar Event Sessions"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the unique code for the session.';
 
-                    trigger OnDrillDown()
-                    begin
-                        OpenSessionCard();
-                    end;
                 }
                 field(Name; Rec.Name)
                 {
@@ -86,31 +82,6 @@ page 50819 "Similar Event Sessions"
         }
     }
 
-    actions
-    {
-        area(Navigation)
-        {
-            action(OpenSession)
-            {
-                ApplicationArea = All;
-                Caption = 'Open Session';
-                Image = Card;
-                ToolTip = 'Open the Event Session card for the selected similar session.';
-
-                trigger OnAction()
-                begin
-                    OpenSessionCard();
-                end;
-            }
-        }
-        area(Promoted)
-        {
-            actionref(OpenSession_Promoted; OpenSession)
-            {
-            }
-        }
-    }
-
     procedure SetBuffer(var SimilarSessionBuffer: Record "Similar Session Buffer" temporary)
     begin
         if SimilarSessionBuffer.FindSet() then
@@ -119,14 +90,5 @@ page 50819 "Similar Event Sessions"
                 Rec.Insert();
             until SimilarSessionBuffer.Next() = 0;
         if Rec.FindFirst() then;
-    end;
-
-    local procedure OpenSessionCard()
-    var
-        EventSession: Record "Event Session";
-    begin
-        if not EventSession.Get(Rec.Code) then
-            exit;
-        Page.Run(Page::"Event Session Card", EventSession);
     end;
 }

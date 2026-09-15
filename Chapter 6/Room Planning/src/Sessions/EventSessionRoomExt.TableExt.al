@@ -6,9 +6,15 @@ tableextension 50808 "Event Session Room Ext" extends "Event Session"
         {
             Caption = 'Room Code';
             DataClassification = CustomerContent;
-            Editable = false;
             TableRelation = Room;
-            ToolTip = 'Specifies the room assigned to this session. You cannot change it here. Use Assign Rooms to assign or move a session.';
+            ToolTip = 'Specifies the room assigned to this session. The room must exist, must not be blocked, must seat the estimated and reserved attendees, and must be free in this time slot.';
+
+            trigger OnValidate()
+            var
+                RoomAssignmentCheck: Codeunit "Room Assignment Check";
+            begin
+                RoomAssignmentCheck.CheckRoomAvailability(Rec);
+            end;
         }
         field(50801; "Estimated Attendees"; Integer)
         {
