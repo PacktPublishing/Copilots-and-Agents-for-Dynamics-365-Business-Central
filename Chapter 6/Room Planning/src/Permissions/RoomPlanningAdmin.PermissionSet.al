@@ -17,6 +17,7 @@ permissionset 50841 "Room Planning Admin"
         page "Session Attendee Res. Entries" = X,
         page "Session Attendee Res. FactBox" = X,
         page "Room Planning Cue" = X,
+        page "Room Planning Role Center" = X,
         page "Similar Event Sessions" = X,
         page "Event Demo Data" = X,
         page "Event Sessions" = X;

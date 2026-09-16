@@ -11,6 +11,7 @@ Stage app for **Chapter 6: Custom Agents**. Rooms, attendee figures, and editabl
 - **Room Assignment Check** (codeunit 50821): capacity, blocked, and double-booking. Called from **Room Code** OnValidate.
 - **Find Similar Sessions** (codeunit 50823, buffer 50804, page **Similar Event Sessions** 50819): ranks other sessions by meaning of name, description, and speakers.
 - **Room Planning Cue** (table 50807, page 50816): sessions without a room, and future sessions over capacity. On **Event Sessions** it follows the **Project Code** of the selected row.
+- **Room Planning Role Center** (page 50810) and **Room Planning Agent** profile: empty role center for the agent — **Projects** (Job List) and the Room Planning cue.
 - **Event Demo Data** (codeunit 50827, page 50818): phased generators — venue and schedule, reservations, cancel a session, fill day-one actuals. Never on install.
 - **Room Planning - Admin** (permission set 50841).
 
