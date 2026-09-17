@@ -1,6 +1,6 @@
 # Chapter 3 – Copilot 3: Import Session Proposals from Excel
 
-Third copilot demo for **Chapter 3: Creating AI solutions with AL and Copilot Toolkit**.
+Third copilot demo for **Chapter 3: Creating Copilots in AL with the AI Development Toolkit**.
 
 ## What this copilot does
 

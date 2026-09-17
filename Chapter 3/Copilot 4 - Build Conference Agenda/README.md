@@ -1,6 +1,6 @@
 # Chapter 3 – Copilot 4: Build Conference Agenda
 
-Fourth copilot demo for **Chapter 3: Creating AI solutions with AL and Copilot Toolkit**.
+Fourth copilot demo for **Chapter 3: Creating Copilots in AL with the AI Development Toolkit**.
 
 This copilot introduces **tool calling** (function calling): the AI model calls AL codeunits to read existing Business Central data and write the proposed schedule — all from within a single `GenerateChatCompletion` call using the `Automatic` tool invoke preference.
 

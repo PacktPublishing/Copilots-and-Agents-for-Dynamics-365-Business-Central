@@ -1,6 +1,6 @@
 # Chapter 3 - Plan Event
 
-First copilot demo for **Chapter 3: Creating AI solutions with AL and Copilot Toolkit**. Event Brief in → plain-text planning steps/tasks out (text-to-text).
+First copilot demo for **Chapter 3: Creating Copilots in AL with the AI Development Toolkit**. Event Brief in → plain-text planning steps/tasks out (text-to-text).
 
 ## What this copilot does
 

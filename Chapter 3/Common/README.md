@@ -1,6 +1,6 @@
 # Chapter 3 - Common
 
-Shared AL app for **Chapter 3: Creating AI solutions with AL and Copilot Toolkit**. This app holds common tables and pages used by the four copilot demos.
+Shared AL app for **Chapter 3: Creating Copilots in AL with the AI Development Toolkit**. This app holds common tables and pages used by the four copilot demos.
 
 ## Contents
 

@@ -1,6 +1,6 @@
 # Chapter 3 - Create Event Project and Tasks
 
-Second copilot demo for **Chapter 3: Creating AI solutions with AL and Copilot Toolkit**. Event Brief in → structured JSON (project header + tasks) → real Job and Job Task records in Business Central.
+Second copilot demo for **Chapter 3: Creating Copilots in AL with the AI Development Toolkit**. Event Brief in → structured JSON (project header + tasks) → real Job and Job Task records in Business Central.
 
 ## What this copilot does
 
