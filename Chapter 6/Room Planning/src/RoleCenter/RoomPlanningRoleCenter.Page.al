@@ -27,6 +27,14 @@ page 50810 "Room Planning Role Center"
                 RunObject = Page "Job List";
                 ToolTip = 'View and manage projects, including event projects used for room planning.';
             }
+            action(Rooms)
+            {
+                ApplicationArea = All;
+                Caption = 'Rooms';
+                Image = Warehouse;
+                RunObject = Page "Room List";
+                ToolTip = 'View venue rooms, capacity, and blocked status for room assignment.';
+            }
         }
         area(Sections)
         {
@@ -41,6 +49,19 @@ page 50810 "Room Planning Role Center"
                     Image = Job;
                     RunObject = Page "Job List";
                     ToolTip = 'View and manage projects, including event projects used for room planning.';
+                }
+            }
+            group(RoomsSection)
+            {
+                Caption = 'Rooms';
+                ToolTip = 'Open venue rooms used for session assignment.';
+                action(RoomList)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Rooms';
+                    Image = Warehouse;
+                    RunObject = Page "Room List";
+                    ToolTip = 'View venue rooms, capacity, and blocked status for room assignment.';
                 }
             }
         }
