@@ -1,8 +1,6 @@
 pagecustomization "RPA Job List" customizes "Job List"
 {
     ClearViews = true;
-    DeleteAllowed = false;
-    InsertAllowed = false;
 
     actions
     {

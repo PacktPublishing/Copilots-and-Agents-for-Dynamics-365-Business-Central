@@ -71,17 +71,17 @@ table 50804 "Similar Session Buffer"
         field(13; "Estimated Attendees"; Integer)
         {
             Caption = 'Estimated Attendees';
-            ToolTip = 'Specifies how many attendees you expect at this session.';
+            ToolTip = 'Specifies how many attendees were expected. Prefer Actual Attendees when estimating a similar upcoming session.';
         }
         field(14; "Actual Attendees"; Integer)
         {
             Caption = 'Actual Attendees';
-            ToolTip = 'Specifies how many attendees were in the room.';
+            ToolTip = 'Specifies how many attendees were in the room. Use this on past similar sessions to set Estimated Attendees on the session you are planning.';
         }
         field(15; "Room Code"; Code[20])
         {
             Caption = 'Room Code';
-            ToolTip = 'Specifies the room assigned to this session.';
+            ToolTip = 'Specifies the room assigned to this similar session. Useful context for past room size; do not copy it blindly.';
         }
     }
 

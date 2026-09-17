@@ -40,13 +40,13 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
             {
                 ApplicationArea = All;
                 StyleExpr = SessionStyle;
-                ToolTip = 'Specifies how many attendees you expect at this session. Fill this in from comparable sessions at previous conferences. It is your estimate, not a counted figure.';
+                ToolTip = 'Specifies how many attendees you expect. If Reserved Attendees is greater than zero, use it as the demand signal; otherwise estimate from Actual Attendees on similar past sessions (Find Similar). Set this before assigning a room.';
             }
             field("Reserved Attendees"; Rec."Reserved Attendees")
             {
                 ApplicationArea = All;
                 StyleExpr = SessionStyle;
-                ToolTip = 'Specifies how many attendees have reserved this session in the conference app. It is zero until attendees start planning their schedule, and not every attendee who reserves a session turns up.';
+                ToolTip = 'Specifies how many attendees reserved this session in the conference app. When greater than zero, treat it as the demand signal for room size. The room Capacity must be at least this number.';
             }
             field("Room Code"; Rec."Room Code")
             {
@@ -58,7 +58,7 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
             {
                 ApplicationArea = All;
                 StyleExpr = SessionStyle;
-                ToolTip = 'Specifies how many attendees were in the room. Fill this in after the session. Last year''s actuals are how you judge an estimate.';
+                ToolTip = 'Specifies how many attendees were in the room after the session. On past sessions, use this value to estimate attendance for similar upcoming sessions.';
             }
         }
         addfirst(FactBoxes)
@@ -80,7 +80,7 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
                 ApplicationArea = All;
                 Caption = 'Find Similar';
                 Image = Find;
-                ToolTip = 'Ranks other sessions by meaning of name, description, and speakers using semantic search.';
+                ToolTip = 'Finds other sessions by meaning of name, description, and speakers. Use Actual Attendees on similar past sessions to set Estimated Attendees for this session.';
 
                 trigger OnAction()
                 begin
@@ -95,7 +95,7 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
                 Image = Warehouse;
                 RunObject = Page "Room Card";
                 RunPageLink = "Code" = field("Room Code");
-                ToolTip = 'Open the card for the room assigned to this session.';
+                ToolTip = 'Opens the Room Card for the assigned room so you can check Capacity, Blocked, and scheduled sessions before keeping or changing the assignment.';
             }
         }
         addfirst(Promoted)
@@ -136,5 +136,5 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
 
     var
         SessionStyle: Text;
-        NoSimilarSessionsMsg: Label 'No similar sessions were found.';
+        NoSimilarSessionsMsg: Label 'No similar sessions were found. Try another session, or enrich Name, Description, or speakers, then run Find Similar again.';
 }

@@ -21,7 +21,7 @@ tableextension 50808 "Event Session Room Ext" extends "Event Session"
             Caption = 'Estimated Attendees';
             DataClassification = CustomerContent;
             MinValue = 0;
-            ToolTip = 'Specifies how many attendees you expect at this session. Fill this in from comparable sessions at previous conferences. It is your estimate, not a counted figure.';
+            ToolTip = 'Specifies how many attendees you expect. If Reserved Attendees is greater than zero, use it as the demand signal; otherwise estimate from Actual Attendees on similar past sessions (Find Similar). Set this before assigning a room.';
         }
         field(50802; "Reserved Attendees"; Integer)
         {
@@ -29,14 +29,14 @@ tableextension 50808 "Event Session Room Ext" extends "Event Session"
             Caption = 'Reserved Attendees';
             Editable = false;
             FieldClass = FlowField;
-            ToolTip = 'Specifies how many attendees have reserved this session in the conference app. It is zero until attendees start planning their schedule, and not every attendee who reserves a session turns up.';
+            ToolTip = 'Specifies how many attendees reserved this session in the conference app. When greater than zero, treat it as the demand signal for room size. The room Capacity must be at least this number.';
         }
         field(50803; "Actual Attendees"; Integer)
         {
             Caption = 'Actual Attendees';
             DataClassification = CustomerContent;
             MinValue = 0;
-            ToolTip = 'Specifies how many attendees were in the room. Fill this in after the session. Last year''s actuals are how you judge an estimate.';
+            ToolTip = 'Specifies how many attendees were in the room after the session. On past sessions, use this value to estimate attendance for similar upcoming sessions.';
         }
     }
 

@@ -58,11 +58,11 @@ codeunit 50821 "Room Assignment Check"
     end;
 
     var
-        RoomDoesNotExistErr: Label 'Room %1 does not exist.';
+        RoomDoesNotExistErr: Label 'Room %1 does not exist. Open Rooms and pick an existing room code; do not invent a new one.', Comment = '%1 = Room code';
         NoReasonGivenLbl: Label 'No reason given.';
-        BlockedErr: Label 'Room %1 is blocked: %2. Choose another room.';
-        NoEstimateErr: Label 'Session %1 has no estimated attendees. Fill in Estimated Attendees before assigning a room.';
-        CapacityEstimateErr: Label 'Room %1 seats %2, but session %3 estimates %4 attendees. Choose a room with at least %4 seats.';
-        CapacityReservedErr: Label 'Room %1 seats %2, but session %3 has %4 reserved attendees. Choose a room with at least %4 seats.';
-        DoubleBookErr: Label 'Room %1 is already assigned to session %2, which runs from %3 to %4. Choose a room that is free in this slot.';
+        BlockedErr: Label 'Room %1 is blocked: %2. Choose another room that is not blocked.', Comment = '%1 = Room code, %2 = Blocked reason';
+        NoEstimateErr: Label 'Session %1 has no estimated attendees. Set Estimated Attendees first (from Reserved Attendees or Find Similar past Actual Attendees), then assign a room.', Comment = '%1 = Session code';
+        CapacityEstimateErr: Label 'Room %1 seats %2, but session %3 estimates %4 attendees. Choose a room with at least %4 seats, or lower the estimate if it was wrong.', Comment = '%1 = Room code, %2 = Room capacity, %3 = Session code, %4 = Estimated attendees';
+        CapacityReservedErr: Label 'Room %1 seats %2, but session %3 has %4 reserved attendees. Choose a room with at least %4 seats.', Comment = '%1 = Room code, %2 = Room capacity, %3 = Session code, %4 = Reserved attendees';
+        DoubleBookErr: Label 'Room %1 is already assigned to session %2, which runs from %3 to %4. Choose a different room that is free in this date and time slot.', Comment = '%1 = Room code, %2 = Conflicting session code, %3 = Start time, %4 = End time';
 }

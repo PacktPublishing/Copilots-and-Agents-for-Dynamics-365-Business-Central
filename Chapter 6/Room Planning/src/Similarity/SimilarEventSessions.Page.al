@@ -66,17 +66,17 @@ page 50819 "Similar Event Sessions"
                 field("Estimated Attendees"; Rec."Estimated Attendees")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies how many attendees you expect at this session.';
+                    ToolTip = 'Specifies how many attendees you expect. On this results list it is only context; for estimation, prefer Actual Attendees on past sessions.';
                 }
                 field("Actual Attendees"; Rec."Actual Attendees")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies how many attendees were in the room.';
+                    ToolTip = 'Specifies how many attendees were in the room. Use this on past similar sessions to set Estimated Attendees on the session you are planning.';
                 }
                 field("Room Code"; Rec."Room Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the room assigned to this session.';
+                    ToolTip = 'Specifies the room that was assigned to this similar session. Useful context when comparing past room sizes; do not copy it blindly to the current session.';
                 }
             }
         }

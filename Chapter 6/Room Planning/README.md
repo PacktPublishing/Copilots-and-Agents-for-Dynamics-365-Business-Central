@@ -10,10 +10,10 @@ Stage app for **Chapter 6: Custom Agents**. Rooms, attendee figures, and editabl
 - **Event Sessions Room Ext** (page extension 50817): estimates, reserved, room, and actuals on the list; **Find Similar** for semantic lookalikes; future scheduled rows turn yellow when reserved demand beats the estimate, and red when reserved attendees exceed the assigned room's capacity.
 - **Room Assignment Check** (codeunit 50821): capacity, blocked, and double-booking. Called from **Room Code** OnValidate.
 - **Find Similar Sessions** (codeunit 50823, buffer 50804, page **Similar Event Sessions** 50819): ranks other sessions by meaning of name, description, and speakers.
-- **Room Planning Cue** (table 50807, page 50816): sessions without a room, and future sessions over capacity. On **Event Sessions** it follows the **Project Code** of the selected row.
+- **Room Planning Cue** (table 50807, page 50816): sessions without an estimate, without a room, and over capacity. On **Event Sessions** it follows the **Project Code** of the selected row.
 - **Room Planning Role Center** (page 50810) and **Room Planning Agent** profile: empty role center for the agent — **Projects** (Job List) and the Room Planning cue. Page customizations trim **Event Sessions**, **Job List**, **Rooms**, and **Similar Event Sessions** for the agent (no insert/delete on sessions; hide fields that are not needed for room planning).
 - **Event Demo Data** (codeunit 50827, page 50818): phased generators — venue and schedule, reservations, cancel a session, fill day-one actuals. Never on install.
-- **Room Planning - Admin** (permission set 50841).
+- **Room Planning - Admin** (permission set 50841) and **Room Planning - Agent** (permission set 50842): admin has full room-planning access; the agent can read projects and rooms, and modify event sessions (estimates and room codes) without insert or delete.
 
 ## Build order
 

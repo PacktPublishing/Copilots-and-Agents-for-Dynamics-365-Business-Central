@@ -11,22 +11,25 @@ table 50807 "Room Planning Cue"
         }
         field(2; "Sessions without a Room"; Integer)
         {
-            CalcFormula = count("Event Session" where(Status = const(Scheduled), "Room Code" = const(''), "Date" = field("Date Filter"), "Project Code" = field("Project Code Filter")));
+            CalcFormula = count("Event Session" where(Status = const(Scheduled), "Room Code" = const(''), "Project Code" = field("Project Code Filter")));
             Caption = 'Sessions without a Room';
             Editable = false;
             FieldClass = FlowField;
-            ToolTip = 'Specifies how many scheduled sessions in the date and event filters have no room yet.';
+            ToolTip = 'Counts scheduled sessions with an empty Room Code. Open the list, set Estimated Attendees first if needed, then assign a free room that fits.';
         }
         field(3; "Over Capacity Sessions"; Integer)
         {
             Caption = 'Over Capacity Sessions';
             Editable = false;
-            ToolTip = 'Specifies how many future scheduled sessions in the event filter have more reserved attendees than the assigned room can seat.';
+            ToolTip = 'Counts scheduled sessions where Reserved Attendees exceed the assigned room Capacity. Move each session to a larger free room, or leave it and ask for help.';
         }
-        field(4; "Date Filter"; Date)
+        field(4; "Sessions without Estimate"; Integer)
         {
-            Caption = 'Date Filter';
-            FieldClass = FlowFilter;
+            CalcFormula = count("Event Session" where(Status = const(Scheduled), "Estimated Attendees" = const(0), "Project Code" = field("Project Code Filter")));
+            Caption = 'Sessions without Estimate';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Counts scheduled sessions with Estimated Attendees = 0. Open each session, use Reserved Attendees or Find Similar past Actual Attendees, then set the estimate before assigning a room.';
         }
         field(5; "Project Code Filter"; Code[20])
         {
@@ -62,7 +65,7 @@ table 50807 "Room Planning Cue"
         EventSession: Record "Event Session";
         OverCapacityCount: Integer;
     begin
-        SetAssignedFutureSessionFilter(EventSession);
+        SetAssignedSessionFilter(EventSession);
         if EventSession.FindSet() then
             repeat
                 if SessionIsOverCapacity(EventSession) then
@@ -77,7 +80,7 @@ table 50807 "Room Planning Cue"
     begin
         // Over capacity compares a FlowField against the room, so it cannot be a filter. Mark the
         // rows instead of building a filter string that grows with the schedule.
-        SetAssignedFutureSessionFilter(EventSession);
+        SetAssignedSessionFilter(EventSession);
         if EventSession.FindSet() then
             repeat
                 if SessionIsOverCapacity(EventSession) then
@@ -88,12 +91,11 @@ table 50807 "Room Planning Cue"
         Page.Run(Page::"Event Sessions", EventSession);
     end;
 
-    local procedure SetAssignedFutureSessionFilter(var EventSession: Record "Event Session")
+    local procedure SetAssignedSessionFilter(var EventSession: Record "Event Session")
     var
         ProjectCodeFilter: Text;
     begin
         EventSession.SetRange(Status, EventSession.Status::Scheduled);
-        EventSession.SetFilter("Date", '%1..', WorkDate());
         EventSession.SetFilter("Room Code", '<>%1', '');
 
         ProjectCodeFilter := Rec.GetFilter("Project Code Filter");

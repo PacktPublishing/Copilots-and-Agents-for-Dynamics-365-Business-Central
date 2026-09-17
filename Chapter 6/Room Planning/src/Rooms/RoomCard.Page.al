@@ -15,27 +15,27 @@ page 50814 "Room Card"
                 field("Code"; Rec."Code")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the code of the room.';
+                    ToolTip = 'Specifies the room code you assign on Event Sessions. Pick an existing code; do not invent one.';
                 }
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the name of the room.';
+                    ToolTip = 'Specifies the display name of the room. Use it to recognize the venue when Capacity alone is not enough.';
                 }
                 field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies how many seats this room has.';
+                    ToolTip = 'Specifies how many seats the room has. Assign this room only when Estimated Attendees and Reserved Attendees are both at or below this number.';
                 }
                 field(Floor; Rec.Floor)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the floor this room is on.';
+                    ToolTip = 'Specifies which floor the room is on. Optional when choosing a room for capacity and availability.';
                 }
                 field("Has Recording"; Rec."Has Recording")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies whether this room can record the session.';
+                    ToolTip = 'Specifies whether the room can record the session. Optional for room planning; capacity and blocked status matter more.';
                 }
             }
             group(Availability)
@@ -44,13 +44,13 @@ page 50814 "Room Card"
                 field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies whether this room is blocked and cannot be assigned.';
+                    ToolTip = 'Specifies whether the room is unavailable. Never assign a blocked room; choose another room instead.';
                 }
                 field("Blocked Reason"; Rec."Blocked Reason")
                 {
                     ApplicationArea = All;
                     Editable = Rec.Blocked;
-                    ToolTip = 'Specifies why this room is blocked.';
+                    ToolTip = 'Specifies why the room is blocked. Use the reason to decide whether another room is needed.';
                 }
             }
         }
@@ -67,7 +67,7 @@ page 50814 "Room Card"
                 Image = Calendar;
                 RunObject = Page "Event Sessions";
                 RunPageLink = "Room Code" = field("Code"), Status = const(Scheduled);
-                ToolTip = 'View sessions assigned to this room that are still scheduled.';
+                ToolTip = 'Opens scheduled sessions already using this room. Check for time overlaps before assigning the same room to another session.';
             }
         }
         area(Promoted)

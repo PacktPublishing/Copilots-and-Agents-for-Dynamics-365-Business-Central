@@ -3,7 +3,7 @@ codeunit 50823 "Find Similar Sessions"
     procedure FindSimilar(CurrentSession: Record "Event Session"; var SimilarSessionBuffer: Record "Similar Session Buffer" temporary)
     var
         EventSession: Record "Event Session";
-        SimilarityResult: Record "Similarity Result" temporary;
+        TempSimilarityResult: Record "Similarity Result" temporary;
         SemanticSearch: Codeunit "Semantic Search";
         RecRef: RecordRef;
         FieldIds: List of [Integer];
@@ -30,14 +30,14 @@ codeunit 50823 "Find Similar Sessions"
         RecRef.GetTable(EventSession);
         SemanticSearch.SetSearchTarget(RecRef);
         SemanticSearch.SetMaxResults(MaxResults());
-        if not SemanticSearch.FindSimilarByField(SearchText, FieldIds, SimilarityResult) then
+        if not SemanticSearch.FindSimilarByField(SearchText, FieldIds, TempSimilarityResult) then
             exit;
 
-        if SimilarityResult.FindSet() then
+        if TempSimilarityResult.FindSet() then
             repeat
-                if EventSession.GetBySystemId(SimilarityResult."System ID") then
-                    InsertBufferRow(SimilarSessionBuffer, EventSession, SimilarityResult);
-            until SimilarityResult.Next() = 0;
+                if EventSession.GetBySystemId(TempSimilarityResult."System ID") then
+                    InsertBufferRow(SimilarSessionBuffer, EventSession, TempSimilarityResult);
+            until TempSimilarityResult.Next() = 0;
     end;
 
     local procedure BuildSearchText(EventSession: Record "Event Session"): Text
@@ -63,11 +63,11 @@ codeunit 50823 "Find Similar Sessions"
         SearchBuilder.Append(Part);
     end;
 
-    local procedure InsertBufferRow(var SimilarSessionBuffer: Record "Similar Session Buffer" temporary; EventSession: Record "Event Session"; SimilarityResult: Record "Similarity Result" temporary)
+    local procedure InsertBufferRow(var SimilarSessionBuffer: Record "Similar Session Buffer" temporary; EventSession: Record "Event Session"; TempSimilarityResult: Record "Similarity Result" temporary)
     begin
         SimilarSessionBuffer.Init();
-        SimilarSessionBuffer.Rank := SimilarityResult."No.";
-        SimilarSessionBuffer.Similarity := Round(SimilarityResult.Similarity, 0.01);
+        SimilarSessionBuffer.Rank := TempSimilarityResult."No.";
+        SimilarSessionBuffer.Similarity := Round(TempSimilarityResult.Similarity, 0.01);
         SimilarSessionBuffer.Code := EventSession.Code;
         SimilarSessionBuffer.Name := EventSession.Name;
         SimilarSessionBuffer.Description := EventSession.Description;
@@ -95,6 +95,6 @@ codeunit 50823 "Find Similar Sessions"
     end;
 
     var
-        EmptySearchTextErr: Label 'Enter a name, description, or speaker on this session before finding similar sessions.';
-        SearchSpaceTooLargeErr: Label 'Semantic search is limited to %1 records. Narrow the filters first.';
+        EmptySearchTextErr: Label 'This session has no searchable text. Fill Name, Description, or a speaker, then run Find Similar again.';
+        SearchSpaceTooLargeErr: Label 'Semantic search is limited to %1 records. Filter Event Sessions to fewer rows (for example by Project Code), then run Find Similar again.', Comment = '%1 = Maximum number of records allowed in the semantic search space';
 }

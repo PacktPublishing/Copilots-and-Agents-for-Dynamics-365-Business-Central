@@ -25,7 +25,7 @@ page 50810 "Room Planning Role Center"
                 Caption = 'Projects';
                 Image = Job;
                 RunObject = Page "Job List";
-                ToolTip = 'View and manage projects, including event projects used for room planning.';
+                ToolTip = 'Opens Projects (Job List). Select the target event project, then open Event Sessions for that project to estimate attendance and assign rooms.';
             }
             action(Rooms)
             {
@@ -33,7 +33,7 @@ page 50810 "Room Planning Role Center"
                 Caption = 'Rooms';
                 Image = Warehouse;
                 RunObject = Page "Room List";
-                ToolTip = 'View venue rooms, capacity, and blocked status for room assignment.';
+                ToolTip = 'Opens Rooms so you can check Code, Capacity, and Blocked before assigning a Room Code on a session.';
             }
         }
         area(Sections)
@@ -41,27 +41,27 @@ page 50810 "Room Planning Role Center"
             group(ProjectsSection)
             {
                 Caption = 'Projects';
-                ToolTip = 'Open projects and related event planning.';
+                ToolTip = 'Navigate to event projects used for room planning.';
                 action(JobList)
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Projects';
                     Image = Job;
                     RunObject = Page "Job List";
-                    ToolTip = 'View and manage projects, including event projects used for room planning.';
+                    ToolTip = 'Opens Projects (Job List). Select the target event project, then open Event Sessions for that project to estimate attendance and assign rooms.';
                 }
             }
             group(RoomsSection)
             {
                 Caption = 'Rooms';
-                ToolTip = 'Open venue rooms used for session assignment.';
+                ToolTip = 'Navigate to venue rooms used for session assignment.';
                 action(RoomList)
                 {
                     ApplicationArea = All;
                     Caption = 'Rooms';
                     Image = Warehouse;
                     RunObject = Page "Room List";
-                    ToolTip = 'View venue rooms, capacity, and blocked status for room assignment.';
+                    ToolTip = 'Opens Rooms so you can check Code, Capacity, and Blocked before assigning a Room Code on a session.';
                 }
             }
         }
