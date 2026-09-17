@@ -31,7 +31,6 @@ page 50819 "Similar Event Sessions"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the unique code for the session.';
-
                 }
                 field(Name; Rec.Name)
                 {
@@ -82,8 +81,15 @@ page 50819 "Similar Event Sessions"
         }
     }
 
-    procedure SetBuffer(var SimilarSessionBuffer: Record "Similar Session Buffer" temporary)
+    trigger OnOpenPage()
     begin
+        if SearchForCaption <> '' then
+            CurrPage.Caption := SearchForCaption;
+    end;
+
+    procedure SetBuffer(var SimilarSessionBuffer: Record "Similar Session Buffer" temporary; SourceSession: Record "Event Session")
+    begin
+        SearchForCaption := StrSubstNo(SimilarToCaptionLbl, SourceSession."Code", SourceSession.Name);
         if SimilarSessionBuffer.FindSet() then
             repeat
                 Rec := SimilarSessionBuffer;
@@ -91,4 +97,8 @@ page 50819 "Similar Event Sessions"
             until SimilarSessionBuffer.Next() = 0;
         if Rec.FindFirst() then;
     end;
+
+    var
+        SearchForCaption: Text;
+        SimilarToCaptionLbl: Label 'Similar to %1 %2', Comment = '%1 = Source session code, %2 = Source session name';
 }

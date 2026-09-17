@@ -130,7 +130,7 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
             Message(NoSimilarSessionsMsg);
             exit;
         end;
-        SimilarEventSessions.SetBuffer(SimilarSessionBuffer);
+        SimilarEventSessions.SetBuffer(SimilarSessionBuffer, Rec);
         SimilarEventSessions.Run();
     end;
 
