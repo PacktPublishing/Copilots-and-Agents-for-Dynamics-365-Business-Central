@@ -68,11 +68,6 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
                 ApplicationArea = All;
                 SubPageLink = "Project Code Filter" = field("Project Code");
             }
-            part(SessionAttendeeReservationFactBox; "Session Attendee Res. FactBox")
-            {
-                ApplicationArea = All;
-                SubPageLink = "Session Code" = field("Code");
-            }
         }
     }
 
@@ -103,27 +98,12 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
                 ToolTip = 'Open the card for the room assigned to this session.';
             }
         }
-        addlast(Navigation)
-        {
-            action(SessionAttendeeReservations)
-            {
-                ApplicationArea = All;
-                Caption = 'Attendee Reservations';
-                Image = LedgerEntries;
-                RunObject = Page "Session Attendee Res. Entries";
-                RunPageLink = "Session Code" = field("Code");
-                ToolTip = 'View attendee reservations from the conference app for this session.';
-            }
-        }
         addfirst(Promoted)
         {
             actionref(FindSimilar_Promoted; FindSimilar)
             {
             }
             actionref(Room_Promoted; Room)
-            {
-            }
-            actionref(SessionAttendeeReservations_Promoted; SessionAttendeeReservations)
             {
             }
         }
