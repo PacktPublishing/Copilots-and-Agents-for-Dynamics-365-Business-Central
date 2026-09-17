@@ -17,6 +17,7 @@ codeunit 50823 "Find Similar Sessions"
             Error(EmptySearchTextErr);
 
         EventSession.SetFilter(Code, '<>%1', CurrentSession.Code);
+        EventSession.SetRange(Status, EventSession.Status::Completed);
         if EventSession.Count() > MaxSearchSpace() then
             Error(SearchSpaceTooLargeErr, MaxSearchSpace());
 
