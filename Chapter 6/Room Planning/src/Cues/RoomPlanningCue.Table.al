@@ -105,11 +105,8 @@ table 50807 "Room Planning Cue"
 
     local procedure SessionIsOverCapacity(EventSession: Record "Event Session"): Boolean
     var
-        Room: Record Room;
+        RoomAssignmentCheck: Codeunit "Room Assignment Check";
     begin
-        EventSession.CalcFields("Reserved Attendees");
-        if not Room.Get(EventSession."Room Code") then
-            exit(false);
-        exit(EventSession."Reserved Attendees" > Room.Capacity);
+        exit(RoomAssignmentCheck.SessionDemandExceedsCapacity(EventSession));
     end;
 }

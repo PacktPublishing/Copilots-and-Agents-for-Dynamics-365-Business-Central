@@ -1,28 +1,34 @@
 # .resources/datasets/RPA-AGENT.yaml
+# Isolated from demo project BC-TECH-2027 so the agent cannot "succeed" by
+# planning the existing T27-* sessions instead of the eval sessions.
+# Setup seeds reservations only — Estimated Attendees must be set by the agent.
 suite_setup: RPA-SETUP
 tests:
   - name: assign_rooms_with_review
-    description: Assign rooms for approved future sessions.
+    description: Estimate attendees and assign rooms for the isolated RPA-EVAL sessions.
     turns:
       - turn_setup:
           setup_actions:
             - action_type: prepare_room_planning_case
               action_data:
-                - project_no: BC-TECH-2027
+                - project_no: RPA-EVAL
         query:
           from: Dmitry
-          title: Assign rooms for BC Tech Summit 2027
+          title: Assign rooms for RPA-EVAL
           message: >
             Estimate attendees and assign rooms for all approved sessions
-            in BC Tech Summit 2027. Use previous sessions and current reservations.
+            on project RPA-EVAL only (RPA-KEY, RPA-LAB, RPA-DEV).
+            Use previous sessions and current reservations.
+            When the room plan is ready, request a review before finishing.
         expected_data:
           intervention_request:
-            type: Review
+            type: ReviewRecord
 
       - query:
           intervention:
             instruction: The room plan looks good. Finish the assignment.
         expected_data:
+          all_scheduled_sessions_have_estimate: true
           all_scheduled_sessions_have_room: true
           no_room_over_capacity: true
           no_double_booking: true

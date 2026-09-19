@@ -10,6 +10,8 @@ codeunit 50870 "Room Planning Agent Tests"
     TestType = AITest;
     TestPermissions = Disabled;
     RequiredTestIsolation = Disabled;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     [Test]
     procedure AssignRoomsFromDataset()
@@ -40,15 +42,22 @@ codeunit 50870 "Room Planning Agent Tests"
     end;
 
     local procedure Initialize()
+    var
+        AgentTestContext: Codeunit "Agent Test Context";
+        AgentSetup: Codeunit "Agent Setup";
     begin
         if Initialized then
             exit;
 
         SetupPerSuiteTestData();
 
-        LibraryAgent.GetAgentUnderTest(AgentUserSecurityId);
+        // Same pattern as Sales Validation Agent: suite Agent is optional.
+        // Coded agents call CreateDefaultAgent() when blank; designed agents look up
+        // the sandbox instance by user name (cannot invent instructions/profile in AL).
+        AgentTestContext.GetAgentUserSecurityID(AgentUserSecurityId);
         if IsNullGuid(AgentUserSecurityId) then
-            Error(NoAgentUnderTestErr);
+            if not AgentSetup.FindAgentByUserName(DefaultAgentUserNameTok, AgentUserSecurityId) then
+                Error(NoAgentUnderTestErr, DefaultAgentUserNameTok);
 
         LibraryAgent.StopTasks(AgentUserSecurityId);
         LibraryAgent.EnsureAgentIsActive(AgentUserSecurityId);
@@ -156,10 +165,10 @@ codeunit 50870 "Room Planning Agent Tests"
     end;
 
     /// <summary>
-    /// Creates the project and three approved (Scheduled) sessions the agent must fill.
-    /// Two sessions run at the same time and only one of them fits the small room, so a
-    /// correct room plan must not double-book the large room to fit both. The third session
-    /// runs later, so it can reuse either room without conflict.
+    /// Creates/resets an isolated project and three approved sessions the agent must fill.
+    /// Two sessions run at the same time and only one fits the small room, so a correct
+    /// plan must not double-book the large room. The third session runs later.
+    /// Must not reuse demo project BC-TECH-2027 — the agent would plan T27-* instead.
     /// </summary>
     local procedure CreateRoomPlanningCase(Action: Codeunit "Test Input Json")
     var
@@ -175,17 +184,21 @@ codeunit 50870 "Room Planning Agent Tests"
 
         CreateApprovedProject(ProjectNo, SessionDate);
 
-        CreateApprovedSession('RPA-KEY', ProjectNo, SessionDate, 103000T, 'Opening Keynote', 380);
-        CreateApprovedSession('RPA-LAB', ProjectNo, SessionDate, 103000T, 'Hands-on Workshop', 25);
-        CreateApprovedSession('RPA-DEV', ProjectNo, SessionDate, 130000T, 'Extending the Base App', 20);
+        EnsureEvalSession('RPA-KEY', ProjectNo, SessionDate, 103000T, 'Opening Keynote', 380);
+        EnsureEvalSession('RPA-LAB', ProjectNo, SessionDate, 103000T, 'Hands-on Workshop', 25);
+        EnsureEvalSession('RPA-DEV', ProjectNo, SessionDate, 130000T, 'Extending the Base App', 20);
     end;
 
     local procedure CreateApprovedProject(ProjectNo: Code[20]; SessionDate: Date)
     var
         Job: Record Job;
     begin
-        if Job.Get(ProjectNo) then
+        if Job.Get(ProjectNo) then begin
+            Job."Starting Date" := SessionDate;
+            Job."Ending Date" := SessionDate;
+            Job.Modify(true);
             exit;
+        end;
 
         Job.Init();
         Job."No." := ProjectNo;
@@ -195,34 +208,58 @@ codeunit 50870 "Room Planning Agent Tests"
         Job.Insert(true);
     end;
 
-    local procedure CreateApprovedSession(SessionCode: Code[20]; ProjectNo: Code[20]; SessionDate: Date; StartTime: Time; SessionName: Text[100]; ReservedAttendees: Integer)
+    /// <summary>
+    /// Inserts the session if missing, otherwise clears prior room assignment and estimate
+    /// so each eval run starts from an unassigned Scheduled state. Seeds reservations only —
+    /// Estimated Attendees stays blank; the agent must set estimates (from Reserved or Find Similar).
+    /// </summary>
+    local procedure EnsureEvalSession(SessionCode: Code[20]; ProjectNo: Code[20]; SessionDate: Date; StartTime: Time; SessionName: Text[100]; ReservedAttendees: Integer)
     var
         EventSession: Record "Event Session";
+        ReservationEntry: Record "Session Attendee Res. Entry";
     begin
-        if EventSession.Get(SessionCode) then
-            exit;
+        if EventSession.Get(SessionCode) then begin
+            EventSession.Name := SessionName;
+            EventSession."Project Code" := ProjectNo;
+            EventSession."Date" := SessionDate;
+            EventSession."Start Time" := StartTime;
+            EventSession."End Time" := StartTime + (60 * 60 * 1000);
+            EventSession."Duration (min)" := 60;
+            EventSession.Status := EventSession.Status::Scheduled;
+            EventSession."Room Code" := '';
+            EventSession."Estimated Attendees" := 0;
+            EventSession.Modify(true);
+        end else begin
+            EventSession.Init();
+            EventSession."Code" := SessionCode;
+            EventSession.Name := SessionName;
+            EventSession."Project Code" := ProjectNo;
+            EventSession."Date" := SessionDate;
+            EventSession."Start Time" := StartTime;
+            EventSession."End Time" := StartTime + (60 * 60 * 1000);
+            EventSession."Duration (min)" := 60;
+            EventSession.Status := EventSession.Status::Scheduled;
+            EventSession.Insert(true);
+        end;
 
-        EventSession.Init();
-        EventSession."Code" := SessionCode;
-        EventSession.Name := SessionName;
-        EventSession."Project Code" := ProjectNo;
-        EventSession."Date" := SessionDate;
-        EventSession."Start Time" := StartTime;
-        EventSession."End Time" := StartTime + (60 * 60 * 1000);
-        EventSession."Duration (min)" := 60;
-        EventSession.Status := EventSession.Status::Scheduled;
-        EventSession.Insert(true);
-
-        CreateReservations(SessionCode, ReservedAttendees);
+        ReservationEntry.SetRange("Session Code", SessionCode);
+        if ReservationEntry.IsEmpty() then
+            CreateReservations(SessionCode, ReservedAttendees);
     end;
 
     local procedure CreateReservations(SessionCode: Code[20]; ReservationCount: Integer)
     var
         ReservationEntry: Record "Session Attendee Res. Entry";
         Index: Integer;
+        NextEntryNo: Integer;
     begin
+        // Match demo-data insert style: Entry No. is AutoIncrement, but manual inserts
+        // elsewhere can leave the SQL identity behind the highest used value.
+        NextEntryNo := ReservationEntry.GetLastEntryNo();
         for Index := 1 to ReservationCount do begin
+            NextEntryNo += 1;
             ReservationEntry.Init();
+            ReservationEntry."Entry No." := NextEntryNo;
             ReservationEntry."Session Code" := SessionCode;
             ReservationEntry."Attendee Email" := CopyStr(StrSubstNo('attendee%1@rpa-agent-tests.local', Index), 1, 80);
             ReservationEntry.Insert(true);
@@ -234,101 +271,64 @@ codeunit 50870 "Room Planning Agent Tests"
     #region Outcome validation
 
     /// <summary>
-    /// Checks the Business Central state after the agent finishes, instead of the text the
-    /// agent wrote in the task timeline.
+    /// Validates only the three RPA-* eval sessions — never company-wide scheduled
+    /// sessions, which include demo data the agent was not asked to plan.
     /// </summary>
     local procedure ValidateRoomPlan(var ErrorReason: Text): Boolean
     var
+        RoomAssignmentCheck: Codeunit "Room Assignment Check";
+        EventSession: Record "Event Session";
         ExpectedData: Codeunit "Test Input Json";
+        CheckElement: Codeunit "Test Input Json";
+        SessionCode: Code[20];
+        ConflictingSession: Record "Event Session";
+        Found: Boolean;
     begin
         ExpectedData := AITTestContext.GetExpectedData();
 
-        if ExpectedData.Element('all_scheduled_sessions_have_room').ValueAsBoolean() then
-            if ScheduledSessionsWithoutRoomsExist() then begin
-                ErrorReason := 'One or more scheduled sessions do not have a room.';
+        foreach SessionCode in EvalSessionCodes() do begin
+            if not EventSession.Get(SessionCode) then begin
+                ErrorReason := StrSubstNo('Eval session %1 is missing.', SessionCode);
                 exit(false);
             end;
 
-        if ExpectedData.Element('no_room_over_capacity').ValueAsBoolean() then
-            if RoomsOverCapacityExist() then begin
-                ErrorReason := 'One or more sessions are assigned to rooms that are too small.';
-                exit(false);
-            end;
+            CheckElement := ExpectedData.ElementExists('all_scheduled_sessions_have_estimate', Found);
+            if Found and CheckElement.ValueAsBoolean() then
+                if EventSession."Estimated Attendees" <= 0 then begin
+                    ErrorReason := StrSubstNo('Session %1 has no Estimated Attendees. The agent must set estimates.', SessionCode);
+                    exit(false);
+                end;
 
-        if ExpectedData.Element('no_double_booking').ValueAsBoolean() then
-            if DoubleBookedRoomsExist() then begin
-                ErrorReason := 'One or more rooms are double-booked.';
-                exit(false);
-            end;
+            if ExpectedData.Element('all_scheduled_sessions_have_room').ValueAsBoolean() then
+                if EventSession."Room Code" = '' then begin
+                    ErrorReason := StrSubstNo('Session %1 does not have a room.', SessionCode);
+                    exit(false);
+                end;
+
+            if ExpectedData.Element('no_room_over_capacity').ValueAsBoolean() then
+                if RoomAssignmentCheck.SessionDemandExceedsCapacity(EventSession) then begin
+                    ErrorReason := StrSubstNo('Session %1 is assigned to a room that is too small.', SessionCode);
+                    exit(false);
+                end;
+
+            if ExpectedData.Element('no_double_booking').ValueAsBoolean() then
+                if RoomAssignmentCheck.FindDoubleBookingConflict(EventSession, ConflictingSession) then begin
+                    ErrorReason := StrSubstNo('Session %1 double-books room %2 with %3.', SessionCode, EventSession."Room Code", ConflictingSession."Code");
+                    exit(false);
+                end;
+        end;
 
         exit(true);
     end;
 
-    local procedure ScheduledSessionsWithoutRoomsExist(): Boolean
+    local procedure EvalSessionCodes(): List of [Code[20]]
     var
-        EventSession: Record "Event Session";
+        SessionCodes: List of [Code[20]];
     begin
-        EventSession.SetRange(Status, EventSession.Status::Scheduled);
-        EventSession.SetRange("Room Code", '');
-        exit(not EventSession.IsEmpty());
-    end;
-
-    local procedure RoomsOverCapacityExist(): Boolean
-    var
-        EventSession: Record "Event Session";
-        Room: Record Room;
-        Demand: Integer;
-    begin
-        EventSession.SetRange(Status, EventSession.Status::Scheduled);
-        EventSession.SetFilter("Room Code", '<>%1', '');
-        if not EventSession.FindSet() then
-            exit(false);
-
-        repeat
-            if Room.Get(EventSession."Room Code") then begin
-                EventSession.CalcFields("Reserved Attendees");
-                Demand := EventSession."Estimated Attendees";
-                if EventSession."Reserved Attendees" > Demand then
-                    Demand := EventSession."Reserved Attendees";
-
-                if Demand > Room.Capacity then
-                    exit(true);
-            end;
-        until EventSession.Next() = 0;
-
-        exit(false);
-    end;
-
-    local procedure DoubleBookedRoomsExist(): Boolean
-    var
-        EventSession: Record "Event Session";
-        OtherEventSession: Record "Event Session";
-    begin
-        EventSession.SetRange(Status, EventSession.Status::Scheduled);
-        EventSession.SetFilter("Room Code", '<>%1', '');
-        if not EventSession.FindSet() then
-            exit(false);
-
-        repeat
-            OtherEventSession.SetFilter("Code", '<>%1', EventSession."Code");
-            OtherEventSession.SetRange(Status, OtherEventSession.Status::Scheduled);
-            OtherEventSession.SetRange("Room Code", EventSession."Room Code");
-            OtherEventSession.SetRange("Date", EventSession.Date);
-            if OtherEventSession.FindSet() then
-                repeat
-                    if TimesOverlap(EventSession."Start Time", EventSession."End Time", OtherEventSession."Start Time", OtherEventSession."End Time") then
-                        exit(true);
-                until OtherEventSession.Next() = 0;
-        until EventSession.Next() = 0;
-
-        exit(false);
-    end;
-
-    local procedure TimesOverlap(StartTime1: Time; EndTime1: Time; StartTime2: Time; EndTime2: Time): Boolean
-    begin
-        if (StartTime1 = 0T) or (EndTime1 = 0T) or (StartTime2 = 0T) or (EndTime2 = 0T) then
-            exit(false);
-        exit((StartTime1 < EndTime2) and (StartTime2 < EndTime1));
+        SessionCodes.Add('RPA-KEY');
+        SessionCodes.Add('RPA-LAB');
+        SessionCodes.Add('RPA-DEV');
+        exit(SessionCodes);
     end;
 
     #endregion
@@ -339,7 +339,8 @@ codeunit 50870 "Room Planning Agent Tests"
         Assert: Codeunit "Library Assert";
         AgentUserSecurityId: Guid;
         Initialized: Boolean;
-        NoAgentUnderTestErr: Label 'Select the agent under test on the evaluation suite.';
+        DefaultAgentUserNameTok: Label 'ROOM PLANNING AGENT', Locked = true;
+        NoAgentUnderTestErr: Label 'Could not find agent %1. Create the designed Room Planning Agent in the sandbox, or select it in the Agent field on the evaluation suite.', Comment = '%1 = agent user name';
         UnknownSetupActionErr: Label 'Unknown setup action_type: %1.', Comment = '%1 = action_type value from the dataset';
         AgentStatusErr: Label 'The agent task did not complete successfully. Status: %1.', Comment = '%1 = task status';
 }

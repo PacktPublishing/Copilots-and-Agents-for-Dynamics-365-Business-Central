@@ -6,6 +6,8 @@
 codeunit 50871 "Room Planning Agent Tst Inst."
 {
     Subtype = Install;
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     trigger OnInstallAppPerCompany()
     begin
