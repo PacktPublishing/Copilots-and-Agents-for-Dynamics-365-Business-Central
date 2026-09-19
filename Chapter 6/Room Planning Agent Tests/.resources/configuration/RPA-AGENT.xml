@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-16" standalone="no"?>
+<Root>
+  <AITSuite Code="RPA-AGENT" Description="Room Planning Agent Evaluation"
+            Dataset="RPA-AGENT.yaml" Capability="Room Planning Agent"
+            Frequency="Daily" TestRunnerId="130451" TestType="Agent">
+    <Line CodeunitID="50870" Description="Room assignment"
+          Dataset="RPA-AGENT.yaml" />
+  </AITSuite>
+</Root>

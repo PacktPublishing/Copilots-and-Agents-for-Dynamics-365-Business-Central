@@ -1,0 +1,11 @@
+# .resources/suite_setup/RPA-SETUP.yaml
+name: RPA-SETUP
+description: Shared setup for Room Planning Agent evaluation.
+suite_setup:
+  setup_actions:
+    - action_type: create_rooms
+      action_data:
+        - code: HALL-A
+          capacity: 400
+        - code: LAB-01
+          capacity: 30

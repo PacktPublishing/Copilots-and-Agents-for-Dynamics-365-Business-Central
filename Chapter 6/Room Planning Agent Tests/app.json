@@ -1,0 +1,54 @@
+{
+    "id": "40e38f12-00dd-4487-b1d2-653224e5edfb",
+    "name": "Chapter 6 - Room Planning Agent Tests",
+    "publisher": "Packt",
+    "version": "1.0.0.0",
+    "brief": "Agent evaluation tests for the Room Planning Agent (Chapter 6).",
+    "description": "Test app for Chapter 6. Data-driven agent evaluation for the designed Room Planning Agent: an AI Eval Suite with TestType=Agent, a YAML dataset with a Review intervention turn, and outcome checks against Event Session records (room assigned, no over-capacity room, no double booking).",
+    "privacyStatement": "",
+    "EULA": "",
+    "help": "",
+    "url": "",
+    "logo": "",
+    "dependencies": [
+        {
+            "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+            "name": "Chapter 3 - Common",
+            "publisher": "Packt",
+            "version": "1.0.0.0"
+        },
+        {
+            "id": "46e6e597-366b-4ed8-b9aa-ddb98540578c",
+            "name": "Chapter 6 - Room Planning",
+            "publisher": "Packt",
+            "version": "1.0.0.0"
+        },
+        {
+            "id": "517f890c-b49f-47de-8120-d0327974b89d",
+            "name": "AI Development Toolkit - Evaluation",
+            "publisher": "Microsoft",
+            "version": "29.0.0.0"
+        }
+    ],
+    "screenshots": [],
+    "platform": "29.0.0.0",
+    "application": "29.0.0.0",
+    "idRanges": [
+        {
+            "from": 50860,
+            "to": 50899
+        }
+    ],
+    "resourceExposurePolicy": {
+        "allowDebugging": true,
+        "allowDownloadingSource": true,
+        "includeSourceInSymbolFile": true
+    },
+    "runtime": "18.0",
+    "features": [
+        "NoImplicitWith"
+    ],
+    "resourceFolders": [
+        ".resources"
+    ]
+}
