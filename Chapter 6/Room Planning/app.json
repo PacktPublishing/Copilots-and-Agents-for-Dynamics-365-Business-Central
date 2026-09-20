@@ -2,7 +2,7 @@
     "id": "46e6e597-366b-4ed8-b9aa-ddb98540578c",
     "name": "Chapter 6 - Room Planning",
     "publisher": "Packt",
-    "version": "1.0.0.0",
+    "version": "1.0.0.6",
     "brief": "Rooms, reservations, and session room assignment for conference room planning.",
     "description": "Chapter 6 stage app. Adds rooms, attendee figures, and editable Room Code on Event Sessions with capacity and double-booking checks. Humans can assign rooms without installing the Room Planning Agent app. No Copilot capability registration and no agent objects.",
     "privacyStatement": "",

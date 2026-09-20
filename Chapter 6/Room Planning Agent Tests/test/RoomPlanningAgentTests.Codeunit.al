@@ -101,6 +101,7 @@ codeunit 50870 "Room Planning Agent Tests"
 
     local procedure CreateRoomsFromAction(Action: Codeunit "Test Input Json")
     var
+        EventDemoData: Codeunit "Event Demo Data";
         RoomsData: Codeunit "Test Input Json";
         RoomData: Codeunit "Test Input Json";
         Index: Integer;
@@ -109,24 +110,10 @@ codeunit 50870 "Room Planning Agent Tests"
 
         for Index := 0 to RoomsData.GetElementCount() - 1 do begin
             RoomData := RoomsData.ElementAt(Index);
-            CreateRoomIfNotExists(
+            EventDemoData.CreateRoom(
                 CopyStr(RoomData.Element('code').ValueAsText(), 1, 20),
                 RoomData.Element('capacity').ValueAsInteger());
         end;
-    end;
-
-    local procedure CreateRoomIfNotExists(RoomCode: Code[20]; Capacity: Integer)
-    var
-        Room: Record Room;
-    begin
-        if Room.Get(RoomCode) then
-            exit;
-
-        Room.Init();
-        Room."Code" := RoomCode;
-        Room.Name := RoomCode;
-        Room.Capacity := Capacity;
-        Room.Insert(true);
     end;
 
     #endregion
@@ -184,63 +171,29 @@ codeunit 50870 "Room Planning Agent Tests"
 
         CreateApprovedProject(ProjectNo, SessionDate);
 
-        EnsureEvalSession('RPA-KEY', ProjectNo, SessionDate, 103000T, 'Opening Keynote', 380);
-        EnsureEvalSession('RPA-LAB', ProjectNo, SessionDate, 103000T, 'Hands-on Workshop', 25);
-        EnsureEvalSession('RPA-DEV', ProjectNo, SessionDate, 130000T, 'Extending the Base App', 20);
+        CreateEvalSession('RPA-KEY', ProjectNo, SessionDate, 103000T, 'Opening Keynote', 380);
+        CreateEvalSession('RPA-LAB', ProjectNo, SessionDate, 103000T, 'Hands-on Workshop', 25);
+        CreateEvalSession('RPA-DEV', ProjectNo, SessionDate, 130000T, 'Extending the Base App', 20);
     end;
 
     local procedure CreateApprovedProject(ProjectNo: Code[20]; SessionDate: Date)
     var
-        Job: Record Job;
+        EventDemoData: Codeunit "Event Demo Data";
+        JobDescription: Text[100];
     begin
-        if Job.Get(ProjectNo) then begin
-            Job."Starting Date" := SessionDate;
-            Job."Ending Date" := SessionDate;
-            Job.Modify(true);
-            exit;
-        end;
-
-        Job.Init();
-        Job."No." := ProjectNo;
-        Job.Description := CopyStr('Room Planning Agent evaluation - ' + ProjectNo, 1, MaxStrLen(Job.Description));
-        Job."Starting Date" := SessionDate;
-        Job."Ending Date" := SessionDate;
-        Job.Insert(true);
+        JobDescription := CopyStr('Room Planning Agent evaluation - ' + ProjectNo, 1, MaxStrLen(JobDescription));
+        EventDemoData.CreateJob(ProjectNo, JobDescription, SessionDate, SessionDate);
     end;
 
     /// <summary>
-    /// Inserts the session if missing, otherwise clears prior room assignment and estimate
-    /// so each eval run starts from an unassigned Scheduled state. Seeds reservations only —
-    /// Estimated Attendees stays blank; the agent must set estimates (from Reserved or Find Similar).
+    /// Creates the session (blank room/estimate) and seeds reservations only when none exist yet.
     /// </summary>
-    local procedure EnsureEvalSession(SessionCode: Code[20]; ProjectNo: Code[20]; SessionDate: Date; StartTime: Time; SessionName: Text[100]; ReservedAttendees: Integer)
+    local procedure CreateEvalSession(SessionCode: Code[20]; ProjectNo: Code[20]; SessionDate: Date; StartTime: Time; SessionName: Text[100]; ReservedAttendees: Integer)
     var
-        EventSession: Record "Event Session";
+        EventDemoData: Codeunit "Event Demo Data";
         ReservationEntry: Record "Session Attendee Res. Entry";
     begin
-        if EventSession.Get(SessionCode) then begin
-            EventSession.Name := SessionName;
-            EventSession."Project Code" := ProjectNo;
-            EventSession."Date" := SessionDate;
-            EventSession."Start Time" := StartTime;
-            EventSession."End Time" := StartTime + (60 * 60 * 1000);
-            EventSession."Duration (min)" := 60;
-            EventSession.Status := EventSession.Status::Scheduled;
-            EventSession."Room Code" := '';
-            EventSession."Estimated Attendees" := 0;
-            EventSession.Modify(true);
-        end else begin
-            EventSession.Init();
-            EventSession."Code" := SessionCode;
-            EventSession.Name := SessionName;
-            EventSession."Project Code" := ProjectNo;
-            EventSession."Date" := SessionDate;
-            EventSession."Start Time" := StartTime;
-            EventSession."End Time" := StartTime + (60 * 60 * 1000);
-            EventSession."Duration (min)" := 60;
-            EventSession.Status := EventSession.Status::Scheduled;
-            EventSession.Insert(true);
-        end;
+        EventDemoData.CreateScheduledSession(SessionCode, SessionName, ProjectNo, SessionDate, StartTime);
 
         ReservationEntry.SetRange("Session Code", SessionCode);
         if ReservationEntry.IsEmpty() then
@@ -249,21 +202,13 @@ codeunit 50870 "Room Planning Agent Tests"
 
     local procedure CreateReservations(SessionCode: Code[20]; ReservationCount: Integer)
     var
-        ReservationEntry: Record "Session Attendee Res. Entry";
+        EventDemoData: Codeunit "Event Demo Data";
         Index: Integer;
-        NextEntryNo: Integer;
     begin
-        // Match demo-data insert style: Entry No. is AutoIncrement, but manual inserts
-        // elsewhere can leave the SQL identity behind the highest used value.
-        NextEntryNo := ReservationEntry.GetLastEntryNo();
-        for Index := 1 to ReservationCount do begin
-            NextEntryNo += 1;
-            ReservationEntry.Init();
-            ReservationEntry."Entry No." := NextEntryNo;
-            ReservationEntry."Session Code" := SessionCode;
-            ReservationEntry."Attendee Email" := CopyStr(StrSubstNo('attendee%1@rpa-agent-tests.local', Index), 1, 80);
-            ReservationEntry.Insert(true);
-        end;
+        for Index := 1 to ReservationCount do
+            EventDemoData.CreateReservation(
+                SessionCode,
+                CopyStr(StrSubstNo('attendee%1@rpa-agent-tests.local', Index), 1, 80));
     end;
 
     #endregion

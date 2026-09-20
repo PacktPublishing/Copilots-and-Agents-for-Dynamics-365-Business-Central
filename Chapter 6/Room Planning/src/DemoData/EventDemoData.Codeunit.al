@@ -35,6 +35,103 @@ codeunit 50827 "Event Demo Data"
     end;
 
     /// <summary>
+    /// Creates a room when it does not already exist.
+    /// </summary>
+    procedure CreateRoom(RoomCode: Code[20]; Capacity: Integer)
+    begin
+        CreateRoom(RoomCode, CopyStr(RoomCode, 1, 100), Capacity, 0, false);
+    end;
+
+    /// <summary>
+    /// Creates the job when missing, otherwise updates description and dates.
+    /// </summary>
+    procedure CreateJob(JobNo: Code[20]; JobDescription: Text[100]; StartingDate: Date; EndingDate: Date)
+    var
+        Job: Record Job;
+    begin
+        if Job.Get(JobNo) then begin
+            Job.Description := JobDescription;
+            Job."Starting Date" := StartingDate;
+            Job."Ending Date" := EndingDate;
+            Job.Modify(true);
+            exit;
+        end;
+
+        Job.Init();
+        Job."No." := JobNo;
+        Job.Description := JobDescription;
+        Job."Starting Date" := StartingDate;
+        Job."Ending Date" := EndingDate;
+        Job.Insert(true);
+    end;
+
+    /// <summary>
+    /// Creates a scheduled session, or resets an existing one to blank room and estimate.
+    /// </summary>
+    procedure CreateScheduledSession(SessionCode: Code[20]; SessionName: Text[100]; ProjectCode: Code[20]; SessionDate: Date; StartTime: Time)
+    var
+        EventSession: Record "Event Session";
+    begin
+        if EventSession.Get(SessionCode) then begin
+            EventSession.Name := SessionName;
+            EventSession."Project Code" := ProjectCode;
+            EventSession."Date" := SessionDate;
+            EventSession."Start Time" := StartTime;
+            EventSession."End Time" := SlotEnd(StartTime);
+            EventSession."Duration (min)" := 60;
+            EventSession.Status := EventSession.Status::Scheduled;
+            EventSession."Room Code" := '';
+            EventSession."Estimated Attendees" := 0;
+            EventSession.Modify(true);
+            exit;
+        end;
+
+        EventSession.Init();
+        EventSession."Code" := SessionCode;
+        EventSession.Name := SessionName;
+        EventSession."Project Code" := ProjectCode;
+        EventSession."Date" := SessionDate;
+        EventSession."Start Time" := StartTime;
+        EventSession."End Time" := SlotEnd(StartTime);
+        EventSession."Duration (min)" := 60;
+        EventSession.Status := EventSession.Status::Scheduled;
+        EventSession.Insert(true);
+    end;
+
+    /// <summary>
+    /// Adds reservations up to ReservationCount. Idempotent per attendee email.
+    /// </summary>
+    procedure CreateReservationCount(SessionCode: Code[20]; ReservationCount: Integer)
+    var
+        EventSession: Record "Event Session";
+        Index: Integer;
+        Email: Text[80];
+        ReservedAt: DateTime;
+    begin
+        if ReservationCount <= 0 then
+            exit;
+
+        ReservedAt := CurrentDateTime();
+        if EventSession.Get(SessionCode) then
+            if (EventSession.Date <> 0D) and (EventSession.Date < WorkDate()) then
+                ReservedAt := CreateDateTime(CalcDate('<-2W>', EventSession.Date), 100000T);
+
+        for Index := 1 to ReservationCount do begin
+            Email := AttendeeEmail(Index);
+            if not ReservationExists(SessionCode, Email) then
+                InsertReservation(SessionCode, Email, ReservedAt);
+        end;
+    end;
+
+    /// <summary>
+    /// Inserts one reservation row. Assigns Entry No. the same way as demo data.
+    /// </summary>
+    procedure CreateReservation(SessionCode: Code[20]; AttendeeEmail: Text[80])
+    begin
+        InsertReservation(SessionCode, AttendeeEmail, CurrentDateTime());
+    end;
+
+    /// <summary>
     /// Cancels the opening keynote. Does not clear Room Code.
     /// </summary>
     procedure CancelKeynoteSession()
@@ -175,20 +272,6 @@ codeunit 50827 "Event Demo Data"
         CreateJob('TECH2025', 'BC Tech Summit 2025', DMY2Date(12, 6, 2025), DMY2Date(13, 6, 2025));
         CreateJob('TECH2026', 'BC Tech Summit 2026', DMY2Date(11, 6, 2026), DMY2Date(12, 6, 2026));
         CreateJob('TECH2027', 'BC Tech Summit 2027', DMY2Date(11, 6, 2027), DMY2Date(12, 6, 2027));
-    end;
-
-    local procedure CreateJob(JobNo: Code[20]; JobDescription: Text[100]; StartingDate: Date; EndingDate: Date)
-    var
-        Job: Record Job;
-    begin
-        if Job.Get(JobNo) then
-            exit;
-        Job.Init();
-        Job."No." := JobNo;
-        Job.Description := JobDescription;
-        Job."Starting Date" := StartingDate;
-        Job."Ending Date" := EndingDate;
-        Job.Insert(true);
     end;
 
     local procedure CreateHistory2024()
@@ -335,18 +418,18 @@ codeunit 50827 "Event Demo Data"
         DayOne: Date;
     begin
         DayOne := DMY2Date(11, 6, 2027);
-        CreateScheduledSession('T27-AI1', DayOne, 090000T);
-        CreateScheduledSession('T27-FIN1', DayOne, 090000T);
-        CreateScheduledSession('T27-DEV1', DayOne, 090000T);
-        CreateScheduledSession('T27-KEY', DayOne, 103000T);
-        CreateScheduledSession('T27-AI2', DayOne, 103000T);
-        CreateScheduledSession('T27-OPS1', DayOne, 103000T);
-        CreateScheduledSession('T27-AI3', DayOne, 130000T);
-        CreateScheduledSession('T27-FIN2', DayOne, 130000T);
-        CreateScheduledSession('T27-LAB', DayOne, 130000T);
-        CreateScheduledSession('T27-NEW', DayOne, 143000T);
-        CreateScheduledSession('T27-DEV2', DayOne, 143000T);
-        CreateScheduledSession('T27-OPS2', DayOne, 143000T);
+        CreateCatalogScheduledSession('T27-AI1', DayOne, 090000T);
+        CreateCatalogScheduledSession('T27-FIN1', DayOne, 090000T);
+        CreateCatalogScheduledSession('T27-DEV1', DayOne, 090000T);
+        CreateCatalogScheduledSession('T27-KEY', DayOne, 103000T);
+        CreateCatalogScheduledSession('T27-AI2', DayOne, 103000T);
+        CreateCatalogScheduledSession('T27-OPS1', DayOne, 103000T);
+        CreateCatalogScheduledSession('T27-AI3', DayOne, 130000T);
+        CreateCatalogScheduledSession('T27-FIN2', DayOne, 130000T);
+        CreateCatalogScheduledSession('T27-LAB', DayOne, 130000T);
+        CreateCatalogScheduledSession('T27-NEW', DayOne, 143000T);
+        CreateCatalogScheduledSession('T27-DEV2', DayOne, 143000T);
+        CreateCatalogScheduledSession('T27-OPS2', DayOne, 143000T);
     end;
 
     local procedure InitHistorySession(var EventSession: Record "Event Session"; SessionCode: Code[20]; EventDate: Date; StartTime: Time; ProjectCode: Code[20])
@@ -370,7 +453,7 @@ codeunit 50827 "Event Demo Data"
         CreateSession(EventSession);
     end;
 
-    local procedure CreateScheduledSession(SessionCode: Code[20]; EventDate: Date; StartTime: Time)
+    local procedure CreateCatalogScheduledSession(SessionCode: Code[20]; EventDate: Date; StartTime: Time)
     var
         EventSession: Record "Event Session";
     begin
@@ -671,28 +754,6 @@ codeunit 50827 "Event Demo Data"
         if ReservedCount < EventSession."Actual Attendees" then
             exit(EventSession."Actual Attendees");
         exit(ReservedCount);
-    end;
-
-    local procedure CreateReservationCount(SessionCode: Code[20]; ReservationCount: Integer)
-    var
-        EventSession: Record "Event Session";
-        Index: Integer;
-        Email: Text[80];
-        ReservedAt: DateTime;
-    begin
-        if ReservationCount <= 0 then
-            exit;
-
-        ReservedAt := CurrentDateTime();
-        if EventSession.Get(SessionCode) then
-            if (EventSession.Date <> 0D) and (EventSession.Date < WorkDate()) then
-                ReservedAt := CreateDateTime(CalcDate('<-2W>', EventSession.Date), 100000T);
-
-        for Index := 1 to ReservationCount do begin
-            Email := AttendeeEmail(Index);
-            if not ReservationExists(SessionCode, Email) then
-                InsertReservation(SessionCode, Email, ReservedAt);
-        end;
     end;
 
     local procedure ReservationExists(SessionCode: Code[20]; Email: Text[80]): Boolean
