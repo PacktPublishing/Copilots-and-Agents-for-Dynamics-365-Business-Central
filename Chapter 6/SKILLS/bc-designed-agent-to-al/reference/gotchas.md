@@ -117,6 +117,19 @@ behind each rule, see `mapping.md`.
       action no longer calls it either (it calls `Agent Task Builder` directly — see
       `mapping.md` § 8) — the pair only exists if another AL app needs to create tasks for
       this agent. If nothing calls it, delete it rather than shipping unused boilerplate.
+- [ ] `-ReuseExistingProfile` skips the profile, permission set, and page customization
+      files, but it always still generates the KPI stand-in (`...KPI.Table.al` /
+      `...KPI.Page.al`) — the skip-list does not cover it. Do not "fix" this by pointing
+      `GetSummaryPageId()` at a real business table the app already has (for example the
+      role center's own cuegroup table) unless that table's primary key is a `User Security
+      ID` field of type `Guid`. Business Central docs only state that requirement explicitly
+      for `GetFirstTimeSetupPageId`/`GetSetupPageId`, but the KPI stand-in the template ships
+      follows the identical shape (see `mapping.md` § 2), and `GetSummaryPageId`'s own docs
+      say the runtime must resolve the summary to one specific agent instance, which needs
+      the same key. A table keyed on something else (a `Code[10]` primary key, for example)
+      will compile but is unverified to render correctly per agent instance at runtime — leave
+      the generated stand-in in place and wire real KPI values into its `Custom KPI` field
+      instead of retargeting the page ID.
 
 ## Before you compile
 

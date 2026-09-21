@@ -1,5 +1,5 @@
 ---
-name: bc-agent-export-to-al
+name: bc-designed-agent-to-al
 description: >-
   Converts an exported Business Central designed-agent XML into a compiling, production-shaped
   AL agent app built from the official Agent project template. Use when the user has exported
@@ -9,7 +9,7 @@ description: >-
   extension.
 ---
 
-# BC agent export to AL
+# BC designed agent to AL
 
 Turns an exported designed-agent XML file into a real AL app, starting from Microsoft's own
 Agent project template, instead of hand-translating the export by reading it and re-typing

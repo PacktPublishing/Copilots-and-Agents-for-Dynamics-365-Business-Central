@@ -233,7 +233,7 @@ if ($InAppMode) {
 
     # Stage 1-10 write into a scratch folder using the "new app" shape; Stage 11 relocates
     # src/ and .resources/ into $RealTargetFolder and throws the rest away.
-    $TargetFolder = Join-Path ([System.IO.Path]::GetTempPath()) "bc-agent-export-to-al-$([guid]::NewGuid().ToString('N'))"
+    $TargetFolder = Join-Path ([System.IO.Path]::GetTempPath()) "bc-designed-agent-to-al-$([guid]::NewGuid().ToString('N'))"
     Write-Info "In-app mode     : merging into $RealTargetFolder (under src/$AgentFolderName)"
 }
 

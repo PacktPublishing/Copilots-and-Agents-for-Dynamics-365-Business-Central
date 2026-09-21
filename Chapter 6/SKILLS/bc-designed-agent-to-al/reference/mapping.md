@@ -309,13 +309,25 @@ task-trigger rewrite) behaves identically in this mode — only three things dif
    Stage 7's review dialog) needs nine consecutive numbers (`{{id+0}}` .. `{{id+8}}`). The
    script checks that `-StartId` through `-StartId + 8` (a) fits inside one `idRanges` entry
    already declared in the existing app's `app.json`, and (b) does not collide with any object
-   number *of any type* already declared anywhere in that app — AL only guarantees a number is
-   unique within an app, not per object type, so a page and a codeunit sharing a number is a
-   real collision here, not a false alarm. It errors out with the specific colliding numbers
-   or the specific range mismatch rather than guessing a value that would compile today and
-   collide the next time someone adds an object by hand. For the Room Planning app
+   number *of any type* already declared anywhere in that app. Note that this is stricter than
+   AL actually requires: object IDs are only required to be unique *per object type*
+   (a `table` and a `codeunit` can legally share the same number — the template itself does
+   this, reusing one offset for a table, a page, a codeunit, and an enum extension at once; see
+   § 2's offset map). The script still treats any existing use of a number, by any type, as a
+   conflict. That's a deliberate simplification, not a correctness requirement — the fixed
+   offset-to-type map in § 2 changes across modes (fewer types are emitted when
+   `-ReuseExistingProfile` skips the profile/permission-set/customization files), so checking
+   "would this exact type collide" would mean duplicating that map in the validator and keeping
+   both in sync. Checking "is this number used at all" is simpler and can only be too cautious,
+   never too permissive — it will occasionally reject a `-StartId` that AL would have accepted,
+   but it will never let a real collision through. It errors out with the specific colliding
+   numbers or the specific range mismatch rather than guessing a value that would compile today
+   and collide the next time someone adds an object by hand. For the Room Planning app
    (`idRanges: [{from: 50800, to: 50849}]`), the longest free run at the time this was written
-   was `50828`-`50840` — pass `-StartId 50828`.
+   was `50828`-`50840` — pass `-StartId 50828`. (After a real run at that offset, `50828`
+   ended up shared by a table, a page, a codeunit, and an enum extension, and `50829` by a
+   codeunit, an enum extension, a page extension, and a table — exactly as designed, and it
+   compiled with 0 errors.)
 2. **The root namespace matches the existing app, including "none".** Older AL apps (this
    book's own Chapter 6 - Room Planning included) predate the `namespace` keyword and declare
    none anywhere. The script scans the existing app's `.al` files for the first `namespace X;`
