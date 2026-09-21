@@ -267,13 +267,32 @@ about *where the message comes from*:
   text the template used to send unseen, opens it with `.RunModal()`, and only proceeds if
   the user confirms (`Action::OK`). The suggested text is a starting point, not the final
   message — the user can edit or replace it before the dialog closes.
-- `AgentTaskBuilder.Initialize(...).AddTaskMessage(From, AssignTaskDialog.GetMessage()).
-  Create()` builds the task from what the user actually confirmed.
+- The confirmed message is wrapped in an `Agent Task Message Builder` — `.Initialize(From,
+  AssignTaskDialog.GetMessage())` then `.SetRequiresReview(false)` — before
+  `AgentTaskBuilder.Initialize(...).AddTaskMessage(AgentTaskMessageBuilder).Create()` builds
+  the task from it. `SetRequiresReview(false)` matters, not just style: by default, every
+  *incoming* task message makes the platform show a second, separate approval screen before
+  the agent starts on it — see "Skipping approval for incoming messages" in the same
+  `ai-agent-sdk-tasks` doc. That default exists for messages the platform can't otherwise
+  vouch for (an email, a business event, an external caller); a message the user just typed
+  and confirmed in `AssignTaskDialog` a moment ago is exactly the "trusted, controlled
+  source" case that doc says is safe to skip it for. Without this call, a user who just
+  reviewed and edited the message in the dialog is asked to review the *same* text a second
+  time, in a second UI, before the agent does anything — confusing, and not what any of
+  Microsoft's own shipped samples do for a message that already went through a review step
+  of their own design.
 - The dialog page itself (`...AssignTaskDialog.Page.al`, `PageType = StandardDialog`) is
   modeled directly on `SalesValAgentDatePicker.Page.al`: `InherentEntitlements = X`,
   `InherentPermissions = X`, plain `GetMessage()`/`SetSuggestedMessage(...)` procedures. The
   one difference is `OnQueryClosePage` rejects a blank message — a date picker has no
-  equivalent empty state to guard against, but a free-text message does.
+  equivalent empty state to guard against, but a free-text message does. The message field
+  itself uses `ShowCaption = false` plus `InstructionalText` instead of a `Caption`/`ToolTip`
+  label — the same styling this book's own Copilot `PromptDialog` pages use for their
+  `area(Prompt)` field (for example `PlanEvent.Page.al`'s `EventBriefText`). A caption to the
+  left of a single, full-width free-text box just restates what the placeholder text already
+  says and makes the box narrower for no benefit; drop it here too, and rewrite the generic
+  `InstructionalText` to the agent's real business verb in step 7, the same as every other
+  generic label the scaffold produces.
 
 This still leaves the generic "record"/"task"/"message" wording in place (step 7's job, not
 this one — see § 6 gotcha 7) — only the *shape* of the trigger (which API, and asking the
@@ -350,3 +369,128 @@ omit `-ReuseExistingProfile` against an existing app that already has hand-built
 profile/permission-set files at the target location, the scaffold still writes its own fresh
 stand-ins into `src/<AgentFolderName>/Permissions` and `src/<AgentFolderName>/Profile`, which
 almost certainly is not what you want — pass the switch.
+
+## 10. The Copilot capability needs an `OnRegisterCopilotCapability` subscriber, not just Install
+
+The raw template's `...Install.Codeunit.al` only calls `RegisterCapability()` from
+`OnInstallAppPerDatabase`. That trigger fires exactly once: the first time this app is ever
+installed in a database. It does **not** fire on later publishes of a newer version of an
+already-installed app — that's an upgrade, not an install, from the platform's point of view.
+
+This is a real, load-bearing bug for `-ExistingAppFolder` mode specifically: by definition,
+`-ExistingAppFolder` merges the agent into an app that already exists in the target
+environment, which was published before the agent objects existed. The very first publish
+after scaffolding is therefore always an upgrade, never a fresh install — `RegisterCapability()`
+never runs, and the agent's capability never appears on **Copilot & agent capabilities**.
+`AgentSetup.OpenAgentLookup`/`Agent Setup` lookups then fail with "There are no active agents
+setup on the system", because the agent type was never registered, so no instance can be
+created for it. (It also bites standalone `-TargetFolder` apps on their *second* version, once
+that app is already installed and gets a normal upgrade — just later.)
+
+`New-AgentAlApp.ps1` patches this automatically (Stage 6): it inserts an
+`[EventSubscriber(ObjectType::Page, Page::"Copilot AI Capabilities", 'OnRegisterCopilotCapability', '', false, false)]`
+procedure that calls the same `RegisterCapability()`, right before that procedure's own
+declaration. This is the fix Microsoft's own shipped `SalesValidationAgent` sample uses (see
+`SalesValAgentInstall.Codeunit.al`) instead of an `Upgrade` codeunit — the capability
+re-registers itself the next time an admin opens the capabilities page, independent of
+install/upgrade timing. If you hit the "no active agents" error after publishing into an
+already-installed app: first confirm your `...Install.Codeunit.al` actually has this
+subscriber (older runs of this skill did not); if it's missing, add it and republish; if it's
+already there, just open **Copilot & agent capabilities** once to fire the event, then retry
+creating the agent instance.
+
+## 11. `.resources/` on disk is not enough — `app.json` must declare `resourceFolders`
+
+`GetInstructions()` in the generated Setup codeunit reads the agent's instructions with
+`NavApp.GetResourceAsText('Instructions/InstructionsV1.txt')`. That call only finds files under
+folders the app's own `app.json` explicitly lists in a `resourceFolders` array — AL does not
+scan the project for a `.resources` folder and package it automatically just because it exists
+on disk. A fresh copy of the raw template already has `"resourceFolders": [".resources"]` in
+*its own* `app.json`, so `-TargetFolder` (standalone) apps get this for free.
+
+`-ExistingAppFolder` mode does not: by design (see § 9) it never rewrites the existing app's
+`app.json` — only `src/<AgentFolderName>/` and `.resources/` get merged in. Without a fix, the
+instructions file lands on disk and even compiles into the `.app` (the compiler doesn't
+validate `resourceFolders` at build time), but `NavApp.GetResourceAsText` can't see it at
+runtime, because the app manifest never told the platform that `.resources/` is a resource
+folder. The failure only shows up when an admin actually activates the agent instance, as:
+"A resource matching 'Instructions/InstructionsV1.txt' could not be found in app '...'".
+
+`New-AgentAlApp.ps1` patches this automatically now (Stage 11, in-app mode only, right after
+copying `.resources/` into the existing app): it reads the existing app's `app.json` and
+- if it already has a `resourceFolders` array containing `.resources`, does nothing;
+- if it has a `resourceFolders` array *without* `.resources`, leaves the file alone and reports
+  a gap — merging into an existing array is left to a human to avoid guessing at unrelated
+  entries or formatting;
+- if it has no `resourceFolders` key at all (the common case for older apps, like this book's
+  own Chapter 6 – Room Planning), inserts `"resourceFolders": [".resources"],` as the first
+  property, matching the file's existing indentation.
+
+If you hit the "resource matching ... could not be found" error after using
+`-ExistingAppFolder`: check the target app's `app.json` for `resourceFolders`; if it's missing
+`.resources` add it by hand, then rebuild and republish (older runs of this skill did not patch
+this automatically).
+
+## 12. The KPI stand-in ships generic — wire it to the agent's real job, not "Custom KPI"
+
+The template's `...KPI.Table.al` has exactly one field beyond the required primary key:
+`field(10; "Custom KPI"; Integer)`, captioned `'Custom KPI'`, with a `// TODO: Add your own KPI
+fields to track agent-specific metrics.` comment. `...KPI.Page.al` embeds that same field on a
+`CardPart` shown inside the agent's first-time setup wizard and on its role center. Shipping
+this verbatim means every reader who sets up the agent sees a field literally labeled "Custom
+KPI" showing `0`, forever — nothing in the template ever writes to it. This is the same class
+of problem as gotcha 7's generic "Assign Agent Task" wording: mechanically correct, compiles
+clean, and tells the reader nothing about what the agent actually does.
+
+**What the field should be**: the one number that answers "what has this agent done for me"
+in its own domain. Not a count of tasks or messages (the platform already tracks those) — a
+count of the agent's actual business outcome. For the Room Planning Agent that's "Sessions
+Assigned" (how many conference sessions now have a room because this agent gave them one).
+Microsoft's own shipped `SalesValidationAgent` sample (`Setup/KPI/SalesValAgentKPI.Table.al`)
+uses "Orders Released" for the same reason — it's what a manager glancing at the KPI card
+would actually want to know.
+
+**Why a plain field update in your own code is not enough, and why the fix must be an event
+subscriber**: a *designed* agent (built in the no-code Agents UI, which is what this skill
+converts) does its actual work by using the same standard Business Central pages a human
+would — it doesn't call a codeunit this app owns to do the work. The generated
+`...TaskExecution.Codeunit.al` (`IAgentTaskExecution`) only hooks message validation and
+annotation; it is never on the call path where the agent actually sets a field. There is no
+single call site in your own code to increment a counter from. (If you had instead written a
+*coded* agent that performs its own business logic inline — for example directly in
+`IAgentTaskExecution` or a codeunit it calls — you could just increment the KPI field right
+there, with no subscriber needed; that's the simpler case, but it's not this skill's case.)
+
+Microsoft's own `SalesValAgentKPILogging` (`Setup/KPI/SalesValAgentKPILogging.Codeunit.al`)
+solves this with a static-automatic event subscriber on the business event that fires when the
+real action happens (`Release Sales Document`'s `OnAfterReleaseSalesDoc`), filtered down with
+three checks, in this order:
+
+1. `Codeunit "Agent Session".IsAgentSession(var AgentMetadataProvider: Enum "Agent Metadata
+   Provider")` — `true` for *any* agent's session, not just this one; the `Enum "Agent
+   Metadata Provider"` value it returns by `var` is what narrows it down.
+2. Compare that enum value to this agent's own `Enum::"Agent Metadata Provider"::"<Your
+   Agent>"` (the same value `...Metadata.Codeunit.al`'s `GetAgentMetadataProvider()` returns).
+   Exit if it doesn't match — some *other* agent type's session fired the same business event.
+3. Confirm the specific business condition that means "this counts" (Microsoft's sample only
+   counts `Document Type = Order`, not quotes/invoices; for a room-planning agent, "Room Code"
+   going from blank to non-blank, not a later edit to an already-assigned session).
+
+Microsoft's sample then does a fourth step — `SalesValAgentSetup.TryGetAgent(var
+AgentUserSecurityId: Guid)` (a plain `FindFirst()` on the Setup table) followed by `if
+UserSecurityId() <> AgentUserSecurityId then exit` — to get the agent's ID before trusting it.
+That extra round trip is only needed if you want the ID *before* you've confirmed the session
+is an agent at all. Once steps 1-2 above have already confirmed the current session is an
+instance of your agent type, `UserSecurityId()` inside that same subscriber call already *is*
+the agent's own `User Security ID` — use it directly and skip the `TryGetAgent` lookup. This
+is also more correct than the sample's `FindFirst()` if more than one instance of the same
+agent type ever exists, since `FindFirst()` always credits whichever instance happens to sort
+first, not the one that actually did the work.
+
+Once you have the confirmed `AgentUserSecurityId`, the update itself is the same three lines
+either way: `Get` the KPI row (or `Init`/set the ID/`Insert` if it doesn't exist yet — the row
+is created lazily, on first increment, not during setup), increment the field, `Modify()`.
+
+This is a required rewrite, not optional polish, same as gotcha 7's task-trigger wording — put
+it in the gap report if you can't identify the agent's real business event yet, but do not
+ship `"Custom KPI"` as the final field name.

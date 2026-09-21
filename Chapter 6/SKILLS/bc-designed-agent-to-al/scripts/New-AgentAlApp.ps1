@@ -835,6 +835,33 @@ if ($installPath) {
     } else {
         Write-Gap "Could not find the InstallAgentSetup(...) call in $($installPath.Name) to anchor the localization call. Localization settings were NOT wired up — add Agent.UpdateLocalizationSettings manually."
     }
+
+    # OnInstallAppPerDatabase only fires the first time this app is ever installed. Any later
+    # publish where the app already exists (an upgrade, including every -ExistingAppFolder run
+    # by definition, since that always targets an app that's already there) never calls it
+    # again, so RegisterCapability() never runs and the agent's capability never shows up on
+    # the Copilot & agent capabilities page. Subscribing to the capabilities page's own
+    # registration event is the fix Microsoft's own SalesValidationAgent sample uses instead of
+    # an Upgrade codeunit: it re-registers the capability every time that page is opened, with
+    # no dependency on install/upgrade timing.
+    $installContent = Get-Content -LiteralPath $installPath.FullName -Raw -Encoding utf8
+    $registerCapabilityAnchor = '    local procedure RegisterCapability()'
+    if ($installContent.Contains($registerCapabilityAnchor) -and -not $installContent.Contains('OnRegisterCopilotCapability')) {
+        $subscriberBlock = @"
+    [EventSubscriber(ObjectType::Page, Page::"Copilot AI Capabilities", 'OnRegisterCopilotCapability', '', false, false)]
+    local procedure OnRegisterCopilotCapability()
+    begin
+        RegisterCapability();
+    end;
+
+$registerCapabilityAnchor
+"@
+        $installContent = $installContent.Replace($registerCapabilityAnchor, $subscriberBlock)
+        Set-Content -LiteralPath $installPath.FullName -Value $installContent -Encoding utf8 -NoNewline
+        Write-Info "Added OnRegisterCopilotCapability event subscriber to $($installPath.Name) so the capability re-registers on upgrade, not just fresh install."
+    } elseif (-not $installContent.Contains($registerCapabilityAnchor)) {
+        Write-Gap "Could not find 'local procedure RegisterCapability()' in $($installPath.Name) to anchor the OnRegisterCopilotCapability subscriber. Add it manually — see mapping.md § 10."
+    }
 } else {
     Write-Gap "Install codeunit ($($BaseName)Install.Codeunit.al) not found after copy."
 }
@@ -869,8 +896,15 @@ if ($pageExtPath -and $TaskTriggerPageName) {
     # "Agent Task Builder" directly, and its real, shipped SalesValidationAgent sample
     # (Interaction/SalesValAgentSalesOrders.PageExt.al) goes one step further: it opens a small
     # StandardDialog page first so the user supplies the actual task input, then builds the task
-    # from what the user confirmed. Replace the whole var/trigger block with that shape instead
-    # of patching the template's version field-by-field.
+    # from what the user confirmed. It also calls SetRequiresReview(false) on the message: by
+    # default the platform makes every incoming message wait for a *second*, separate approval
+    # screen before the agent starts (see "Skipping approval for incoming messages" in the same
+    # ai-agent-sdk-tasks doc) -- a safety net for messages the platform can't otherwise vouch
+    # for (an email, a business event). A message the user just composed and confirmed in our
+    # own dialog doesn't need that second gate; skipping it here is exactly the "trusted,
+    # controlled source" case that doc says it's safe to skip for. Replace the whole
+    # var/trigger block with that shape instead of patching the template's version
+    # field-by-field.
     $oldTriggerBlock = @"
                 trigger OnAction()
                 var
@@ -915,6 +949,7 @@ if ($pageExtPath -and $TaskTriggerPageName) {
                 var
                     AgentSetup: Codeunit "Agent Setup";
                     AgentTaskBuilder: Codeunit "Agent Task Builder";
+                    AgentTaskMessageBuilder: Codeunit "Agent Task Message Builder";
                     AgentTask: Record "Agent Task";
                     AssignTaskDialog: Page "$dialogPageName";
                     AgentUserSecurityId: Guid;
@@ -937,10 +972,20 @@ if ($pageExtPath -and $TaskTriggerPageName) {
                     TaskTitle := CopyStr(StrSubstNo(TaskTitleLbl, Rec."$TaskTriggerCaptionField"), 1, MaxStrLen(TaskTitle));
                     From := CopyStr(UserId(), 1, MaxStrLen(From));
 
+                    // The platform requires user approval on every incoming message by default,
+                    // as a safety net for messages it can't otherwise vouch for (an email, a
+                    // business event, an external caller). This message doesn't need that
+                    // second gate: the user already reviewed and confirmed it in the dialog
+                    // above, so requiring it again here would just ask the same person to
+                    // approve their own already-approved text. SetRequiresReview(false) skips
+                    // that redundant gate for this trusted, user-confirmed source only.
+                    AgentTaskMessageBuilder.Initialize(From, AssignTaskDialog.GetMessage());
+                    AgentTaskMessageBuilder.SetRequiresReview(false);
+
                     // Assign the task to the agent
                     AgentTask := AgentTaskBuilder
                         .Initialize(AgentUserSecurityId, TaskTitle)
-                        .AddTaskMessage(From, AssignTaskDialog.GetMessage())
+                        .AddTaskMessage(AgentTaskMessageBuilder)
                         .Create();
 
                     Message(TaskAssignedMsg, AgentTask.ID, Rec."$TaskTriggerCaptionField");
@@ -961,7 +1006,12 @@ if ($pageExtPath -and $TaskTriggerPageName) {
     # Generate the review dialog the rewritten trigger now opens. Modeled directly on
     # SalesValidationAgent's own "Sales Val. Agent Date Picker" (StandardDialog, plain
     # Get/Set procedures, InherentEntitlements/Permissions = X) -- the only difference is a
-    # free-text message field instead of a date, so it needs a not-blank check on close.
+    # free-text message field instead of a date, so it needs a not-blank check on close. The
+    # field itself uses ShowCaption = false + InstructionalText instead of a Caption/ToolTip
+    # label, the same way this book's own Copilot PromptDialog pages (area(Prompt) fields
+    # like PlanEvent.Page.al's EventBriefText) style a free-text box: a caption to the left
+    # leaves the box narrow and restates what the InstructionalText placeholder already says,
+    # so dropping the caption lets the one field the user actually cares about fill the page.
     $dialogFileName = Rename-AgentFileName "$($BaseName)AssignTaskDialog.Page.al"
     $dialogPath = Join-Path $pageExtPath.DirectoryName $dialogFileName
     $dialogObjectId = $StartId + 8
@@ -986,11 +1036,12 @@ page $dialogObjectId "$dialogPageName"
         {
             field(MessageText; MessageText)
             {
-                Caption = 'Message';
-                ToolTip = 'Specifies what you want the agent to do. Edit the suggested message, or replace it with your own.';
                 ApplicationArea = All;
+                ShowCaption = false;
                 MultiLine = true;
                 ShowMandatory = true;
+                InstructionalText = 'Describe what you want the agent to do. Edit the suggested message, or replace it with your own.';
+                ToolTip = 'Specifies what you want the agent to do.';
             }
         }
     }
@@ -1321,6 +1372,29 @@ if ($InAppMode) {
     if (Test-Path -LiteralPath $scratchResources) {
         New-Item -ItemType Directory -Path $realResources -Force | Out-Null
         Copy-ScratchTree -From $scratchResources -To $realResources
+
+        # A fresh template app's own app.json declares "resourceFolders": [".resources"], which
+        # is what makes NavApp.GetResourceAsText/ListResources find anything under .resources/
+        # at runtime -- AL does not infer this from the folder's mere existence on disk. In-app
+        # mode otherwise never touches the existing app's app.json, so without this the agent's
+        # instructions resource compiles into the .app fine but fails at runtime with "A
+        # resource matching '...' could not be found" the first time the agent is activated.
+        $existingAppJsonPath = Join-Path $RealTargetFolder 'app.json'
+        $appJsonRaw = Get-Content -LiteralPath $existingAppJsonPath -Raw -Encoding utf8
+        if ($appJsonRaw -match '"resourceFolders"\s*:\s*\[([^\]]*)\]') {
+            if ($Matches[1] -notmatch '\.resources') {
+                Write-Gap "Existing app.json already has a `"resourceFolders`" array without `".resources`" in it. Add `".resources`" to that array by hand, or NavApp.GetResourceAsText will not find the instructions resource this run wrote to .resources/, and agent activation fails with `"A resource matching ... could not be found`"."
+            }
+        } else {
+            $indentMatch = [regex]::Match($appJsonRaw, '(?m)^([ \t]+)"')
+            $indent = if ($indentMatch.Success) { $indentMatch.Groups[1].Value } else { '    ' }
+            $firstBraceIndex = $appJsonRaw.IndexOf('{')
+            $before = $appJsonRaw.Substring(0, $firstBraceIndex + 1)
+            $after = $appJsonRaw.Substring($firstBraceIndex + 1)
+            $appJsonRaw = "$before`n${indent}`"resourceFolders`": [ `".resources`" ],$after"
+            Set-Content -LiteralPath $existingAppJsonPath -Value $appJsonRaw -Encoding utf8 -NoNewline
+            Write-Info "Added `"resourceFolders`": [`".resources`"] to $existingAppJsonPath (required for NavApp.GetResourceAsText to find the instructions resource at runtime; existing app.json files usually don't declare this on their own)."
+        }
     }
 
     Remove-Item -LiteralPath $TargetFolder -Recurse -Force -ErrorAction SilentlyContinue

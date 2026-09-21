@@ -79,6 +79,13 @@ behind each rule, see `mapping.md`.
       the same shape as the real, shipped `SalesValidationAgent`'s date-picker dialog. See
       `mapping.md` § 8. `Test-AgentAlApp.ps1`'s `{{...}}`/`TODO:` scan does not (and cannot)
       check for this shape; verify it by reading the trigger, not just by a clean compile.
+- [ ] That same trigger also wraps the confirmed message in an `Agent Task Message Builder`
+      and calls `.SetRequiresReview(false)` before handing it to `Agent Task Builder`. Without
+      that call, the platform's default second approval screen makes the user review the same
+      message they just confirmed in the dialog — see `mapping.md` § 8 for exactly why this
+      default exists and why our case is the documented exception. If you test manually and
+      still see a "Review step 1 of 1" screen showing the message you just typed, confirm this
+      call is present before assuming it's expected platform behavior.
 - [ ] With `-ExistingAppFolder`, `-StartId` is validated against that app's own `idRanges`
       and against every object number already used anywhere in it (any object type, not
       just the same one) — nine consecutive free numbers are needed for `{{id+0}}` ..
@@ -100,6 +107,24 @@ behind each rule, see `mapping.md`.
       confirmed by scanning the existing app's `.al` files first. Pass `-RootNamespace`
       explicitly to override this detection if the existing app actually mixes namespaced
       and non-namespaced files.
+- [ ] With `-ExistingAppFolder`, the very first publish after scaffolding is always an
+      *upgrade* of the target app (it already existed and was already installed), never a
+      fresh install — so `OnInstallAppPerDatabase` never fires and `RegisterCapability()`
+      never runs on its own. The script patches `...Install.Codeunit.al` with an
+      `OnRegisterCopilotCapability` event subscriber (see `mapping.md` § 10) so the
+      capability registers itself the next time **Copilot & agent capabilities** is opened.
+      If you don't see your agent's capability there after publishing, confirm that
+      subscriber exists in the generated Install codeunit before assuming it's an
+      environment problem.
+- [ ] With `-ExistingAppFolder`, the script also patches the existing app's `app.json` to add
+      `"resourceFolders": [".resources"]` if that key isn't already there (see `mapping.md`
+      § 11) — `NavApp.GetResourceAsText` needs it to find the instructions resource at
+      runtime; a `.resources/` folder existing on disk is not enough on its own, and this
+      compiles fine either way, so the gap only surfaces when an admin activates the agent
+      instance and gets "A resource matching 'Instructions/InstructionsV1.txt' could not be
+      found". If the existing `app.json` already had a *different* `resourceFolders` array
+      (rare), the script leaves it alone and reports a gap instead of guessing how to merge —
+      add `.resources` to that array by hand.
 
 ## After scaffolding, before you ship
 
@@ -117,6 +142,17 @@ behind each rule, see `mapping.md`.
       action no longer calls it either (it calls `Agent Task Builder` directly — see
       `mapping.md` § 8) — the pair only exists if another AL app needs to create tasks for
       this agent. If nothing calls it, delete it rather than shipping unused boilerplate.
+- [ ] The Setup table/page/codeunit ship a placeholder `"Custom Property"` field (table field
+      10, a page field under "Additional Configuration", `DefaultCustomPropertyLbl`) with
+      `// TODO: Replace or extend with your own fields` comments. Decide whether your agent
+      actually needs a configurable setting; if not, remove the field from all three files
+      rather than shipping "Custom Property: Default Value" as visible, unexplained UI in the
+      first-time setup wizard. When you do, do **not** delete the whole
+      `SaveCustomProperties` procedure along with the field — despite its name, it's also the
+      only place that inserts the persistent row into your own Setup table (the row the
+      Install/Upgrade codeunits' `FindSet()` depends on). Strip the field assignment, keep
+      the `Get`/`Init`/`Insert` row-persistence logic, and consider renaming the procedure
+      (for example, to `PersistSetupRecord`) so its name still matches what it does.
 - [ ] `-ReuseExistingProfile` skips the profile, permission set, and page customization
       files, but it always still generates the KPI stand-in (`...KPI.Table.al` /
       `...KPI.Page.al`) — the skip-list does not cover it. Do not "fix" this by pointing
@@ -128,8 +164,22 @@ behind each rule, see `mapping.md`.
       say the runtime must resolve the summary to one specific agent instance, which needs
       the same key. A table keyed on something else (a `Code[10]` primary key, for example)
       will compile but is unverified to render correctly per agent instance at runtime — leave
-      the generated stand-in in place and wire real KPI values into its `Custom KPI` field
-      instead of retargeting the page ID.
+      the generated stand-in's table/page shape in place (don't retarget the page ID), but do
+      rename its one field away from `"Custom KPI"` and add the logging codeunit that
+      increments it — see the next bullet and `mapping.md` § 12.
+- [ ] Do not ship the KPI stand-in's field as `"Custom KPI"` — a setup wizard or role center
+      showing a field literally labeled "Custom KPI: 0" forever (nothing in the template ever
+      writes to it) is the same class of drift as gotcha 7's generic "Assign Agent Task"
+      wording. Pick the one number that answers "what has this agent done for me" in its own
+      domain (`mapping.md` § 12 walks the Room Planning Agent's own "Sessions Assigned"
+      through this), rename the table field, the page control, the caption, and the tooltip
+      to that metric, then add a small `EventSubscriberInstance = StaticAutomatic` codeunit
+      that increments it — following Microsoft's own `SalesValAgentKPILogging` sample's
+      three-check filter (`Agent Session.IsAgentSession` → this agent's own `Agent Metadata
+      Provider` value → the specific business condition that counts). A *designed* agent (the
+      only kind this skill converts) does its real work through standard pages, not through
+      any codeunit this app owns, so there is no single call site to increment a plain field
+      from directly — the event subscriber is not optional scaffolding, it's the only way in.
 
 ## Before you compile
 

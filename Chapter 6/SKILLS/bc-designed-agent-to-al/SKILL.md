@@ -156,22 +156,35 @@ are never touched.
    calling `Agent Task Builder`" structure is identical). See `reference/mapping.md` § 8.
 7. **Rewrite the task-trigger action for the agent's real job.** Open the generated
    `src/Interaction/*.PageExt.al` and `...AssignTaskDialog.Page.al`. Rename the action
-   identifier, `Caption`, `ToolTip`, dialog caption, and every `Lbl`/`Err`/`Msg` label away
-   from the generic "record"/"task"/"message" wording the script produced, using the
-   business verb from step 5. Decide whether the generated `...PublicAPI`/
+   identifier, `Caption`, `ToolTip`, dialog caption, the message field's `InstructionalText`
+   and `ToolTip` (it ships with `ShowCaption = false`, so those two carry all the wording),
+   and every `Lbl`/`Err`/`Msg` label away from the generic "record"/"task"/"message" wording
+   the script produced, using the business verb from step 5. Decide whether the generated
+   `...PublicAPI`/
    `...PublicAPIImpl` codeunit pair is even needed — the task-trigger action no longer
    calls it, so delete it unless another AL app needs to create tasks for this agent. See
    `reference/mapping.md` gotcha 7 for the full before/after comparison against
    `SalesValidationAgent`.
-8. **Verify.** Run `Test-AgentAlApp.ps1`. It scans for leftover `{{...}}` tokens, leftover
+8. **Wire the KPI stand-in to a real, agent-specific metric.** The template's
+   `...KPI.Table.al`/`...KPI.Page.al` ship with one generic `"Custom KPI"` integer field and a
+   `// TODO: Add your own KPI fields` comment. Do not ship that. Pick the one number that
+   actually answers "what has this agent done for me" in its own domain (for the Room
+   Planning Agent, "Sessions Assigned"; for a sales-validation agent, "Orders Released"),
+   rename the field and its page control to that metric, and add a small event-subscriber
+   codeunit that increments it — see `reference/mapping.md` § 12 for the exact pattern
+   (including why a designed agent needs an event subscriber here, unlike a metric you could
+   just update inline in your own `TaskExecution` codeunit) and Microsoft's own
+   `SalesValAgentKPILogging` as the reference shape.
+9. **Verify.** Run `Test-AgentAlApp.ps1`. It scans for leftover `{{...}}` tokens, leftover
    `TODO:` markers in slots the skill claims to have filled, and leftover `MyAgent`/`My
    Agent` text the rename pass missed, then attempts a real compile if a usable compiler is
    available (prefer the AL MCP server's `al_build`/`al_compile` tools, or VS Code, over a
    bundled `alc.exe` — see `reference/gotchas.md` for why the bundled binary is often not
    directly runnable).
-9. **Report.** Hand the reader the printed mapping table and the gap list (profile/page
-   customization ownership, object IDs to confirm, the task-trigger rewrite from step 7,
-   any dropped or unresolved access control). Do not silently paper over a gap — list it.
+10. **Report.** Hand the reader the printed mapping table and the gap list (profile/page
+   customization ownership, object IDs to confirm, the task-trigger rewrite from step 7, the
+   KPI rewrite from step 8, any dropped or unresolved access control). Do not silently paper
+   over a gap — list it.
 
 ## Guardrails
 
@@ -195,6 +208,17 @@ are never touched.
   first-party agent open a small dialog first so the user supplies or confirms the actual
   input (see `reference/mapping.md` § 8). The scaffold already does this; do not undo it
   by hand-rolling a `StrSubstNo`-only trigger during step 7's rewording pass.
+- Do not drop the `AgentTaskMessageBuilder.SetRequiresReview(false)` call the scaffold adds
+  to the task-trigger action while rewording it in step 7. Without it, the platform's own
+  default approval gate makes the user review the exact same message a *second* time, in a
+  separate screen, right after they already confirmed it in the dialog — see
+  `reference/mapping.md` § 8 for why this default exists and why our case is the documented
+  exception to it.
+- Do not leave the KPI stand-in's `"Custom KPI"` field, caption, or tooltip in the shipped
+  app, and do not "fix" it by pointing `GetSummaryPageId()` at an unrelated business table
+  instead. Rename the field to the agent's real metric and add the logging codeunit that
+  increments it (step 8, `reference/mapping.md` § 12). A setup wizard showing "Custom KPI: 0"
+  is exactly the kind of unexplained placeholder UI this skill exists to prevent.
 - When something cannot be verified (an object ID, a dependency version, a permission), put
   it in the gap report instead of guessing a value that compiles but is wrong.
 - With `-ExistingAppFolder`, never pick `-StartId` by guessing. `New-AgentAlApp.ps1`
