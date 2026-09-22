@@ -1,3 +1,5 @@
+namespace Packt;
+
 using System.Agents;
 using System.AI;
 using System.Reflection;
@@ -12,7 +14,7 @@ using System.Security.AccessControl;
 /// Integrates with Copilot Capability system for permission management and feature availability.
 /// Used by the agent framework to instantiate and configure new agent instances.
 /// </remarks>
-codeunit 50828 RoomPlanningAgentFactory implements IAgentFactory
+codeunit 50850 RoomPlanningAgentFactory implements IAgentFactory
 {
     Access = Internal;
 
@@ -47,9 +49,6 @@ codeunit 50828 RoomPlanningAgentFactory implements IAgentFactory
     /// <returns>True if the agent creation capability should be shown in the UI, false otherwise.</returns>
     procedure ShowCanCreateAgent(): Boolean
     begin
-        // TODO:
-        // True always allows new agent instances to be created.
-        // If you want a single instance codeunit, implement logic to check for existing instances here.
         exit(true);
     end;
 
@@ -60,7 +59,7 @@ codeunit 50828 RoomPlanningAgentFactory implements IAgentFactory
     /// <returns>The copilot capability value.</returns>
     procedure GetCopilotCapability(): Enum "Copilot Capability"
     begin
-        exit("Copilot Capability"::"Room Planning Agent Capability");
+        exit("Copilot Capability"::"Room Planning Agent");
     end;
 
     /// <summary>

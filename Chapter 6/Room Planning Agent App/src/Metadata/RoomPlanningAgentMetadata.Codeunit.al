@@ -1,3 +1,5 @@
+namespace Packt;
+
 using System.Agents;
 
 /// <summary>
@@ -10,7 +12,7 @@ using System.Agents;
 /// Essential for agent runtime operations and user interface customization.
 /// Integrates with agent task messaging and page context systems.
 /// </remarks>
-codeunit 50830 RoomPlanningAgentMetadata implements IAgentMetadata
+codeunit 50852 RoomPlanningAgentMetadata implements IAgentMetadata
 {
     Access = Internal;
 
@@ -64,7 +66,6 @@ codeunit 50830 RoomPlanningAgentMetadata implements IAgentMetadata
     /// <returns>The ID of the page that is used to display agent task messages</returns>
     procedure GetAgentTaskMessagePageId(AgentUserId: Guid; MessageId: Guid): Integer
     begin
-        // TODO: Customize if a different page is needed for reviewing agent task messages
         exit(Page::"Agent Task Message Card");
     end;
 
@@ -77,17 +78,8 @@ codeunit 50830 RoomPlanningAgentMetadata implements IAgentMetadata
     /// <param name="AgentUserId">The agent user id.</param>
     /// <param name="Annotations">The annotations to be added to the agent.</param>
     procedure GetAgentAnnotations(AgentUserId: Guid; var Annotations: Record "Agent Annotation")
-    // var
-    //     ErrorMessageLbl: Label 'Example error message';
-    //     ErrorDetailsLbl: Label 'Example error details explaining the issue.';
     begin
         Clear(Annotations);
-        // TODO: Add error or warning annotations
-        // Annotations.Code := 'INV001';
-        // Annotations.Severity := Annotations.Severity::Error;
-        // Annotations.Message := ErrorMessageLbl;
-        // Annotations.Details := ErrorDetailsLbl;
-        // Annotations.Insert();
     end;
 
     var

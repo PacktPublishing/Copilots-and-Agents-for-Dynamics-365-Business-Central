@@ -1,13 +1,14 @@
+namespace Packt;
+
 /// <summary>
-/// Lets the user review and edit the room-assignment request before it is sent to
-/// the Room Planning Agent as a new task.
+/// Lets the user review and edit the room-planning message before it is sent to the agent.
 /// </summary>
-page 50836 "RPA Assign Task Dialog"
+page 50858 "RPA Assign Task Dialog"
 {
-    PageType = StandardDialog;
     Caption = 'Assign Rooms with Agent';
     InherentEntitlements = X;
     InherentPermissions = X;
+    PageType = StandardDialog;
 
     layout
     {
@@ -16,11 +17,11 @@ page 50836 "RPA Assign Task Dialog"
             field(MessageText; MessageText)
             {
                 ApplicationArea = All;
-                ShowCaption = false;
+                InstructionalText = 'Describe which event needs rooms assigned. Edit the suggested message, or replace it with your own.';
                 MultiLine = true;
+                ShowCaption = false;
                 ShowMandatory = true;
-                InstructionalText = 'Describe the room assignment you want. Edit the suggested message, or replace it with your own.';
-                ToolTip = 'Specifies the room-assignment request to send to the Room Planning Agent.';
+                ToolTip = 'Specifies the message the Room Planning Agent should use to identify the event and assign rooms to its sessions.';
             }
         }
     }
@@ -45,5 +46,5 @@ page 50836 "RPA Assign Task Dialog"
 
     var
         MessageText: Text;
-        MessageRequiredErr: Label 'Enter a room-assignment request before you continue.';
+        MessageRequiredErr: Label 'Enter a message for the Room Planning Agent before you continue.';
 }

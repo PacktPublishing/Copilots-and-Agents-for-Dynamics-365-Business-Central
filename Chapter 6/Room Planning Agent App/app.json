@@ -1,0 +1,48 @@
+{
+    "id": "f6d54bac-5fca-4a8e-8fc3-bc288b7d4f3a",
+    "name": "Chapter 6 - Room Planning Agent",
+    "publisher": "Packt",
+    "version": "1.0.0.0",
+    "brief": "AL app for the Room Planning Agent that assigns rooms to conference sessions.",
+    "description": "Chapter 6 agent app converted from the designed Room Planning Agent. Reuses the profile, page customizations, and permission set from Chapter 6 - Room Planning. Humans assign rooms from Job Card; the agent estimates attendance and sets Room Code on Event Sessions.",
+    "privacyStatement": "",
+    "EULA": "",
+    "help": "",
+    "url": "",
+    "logo": "",
+    "dependencies": [
+        {
+            "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+            "name": "Chapter 3 - Common",
+            "publisher": "Packt",
+            "version": "1.0.0.0"
+        },
+        {
+            "id": "46e6e597-366b-4ed8-b9aa-ddb98540578c",
+            "name": "Chapter 6 - Room Planning",
+            "publisher": "Packt",
+            "version": "1.0.0.6"
+        }
+    ],
+    "screenshots": [],
+    "platform": "29.0.0.0",
+    "application": "29.0.0.0",
+    "idRanges": [
+        {
+            "from": 50850,
+            "to": 50869
+        }
+    ],
+    "resourceExposurePolicy": {
+        "allowDebugging": true,
+        "allowDownloadingSource": true,
+        "includeSourceInSymbolFile": true
+    },
+    "runtime": "18.0",
+    "features": [
+        "NoImplicitWith"
+    ],
+    "resourceFolders": [
+        ".resources"
+    ]
+}

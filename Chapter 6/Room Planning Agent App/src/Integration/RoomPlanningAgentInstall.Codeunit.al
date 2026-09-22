@@ -1,8 +1,9 @@
+namespace Packt;
+
 using System.Agents;
 using System.AI;
-using System.Security.AccessControl;
 
-codeunit 50829 "Room Planning Agent Install"
+codeunit 50851 "Room Planning Agent Install"
 {
     Subtype = Install;
     Access = Internal;
@@ -26,8 +27,6 @@ codeunit 50829 "Room Planning Agent Install"
     local procedure InstallAgent(var RoomPlanningAgentSetup: Record "Room Planning Agent Setup")
     begin
         InstallAgentInstructions(RoomPlanningAgentSetup);
-        InstallAccessControl(RoomPlanningAgentSetup);
-        InstallAgentSetup(RoomPlanningAgentSetup);
         InstallAgentLocalization(RoomPlanningAgentSetup);
     end;
 
@@ -37,20 +36,6 @@ codeunit 50829 "Room Planning Agent Install"
         RoomPlanningAgentSetupCU: Codeunit "Room Planning Agent Setup";
     begin
         Agent.SetInstructions(RoomPlanningAgentSetup."User Security ID", RoomPlanningAgentSetupCU.GetInstructions());
-    end;
-
-    local procedure InstallAccessControl(var RoomPlanningAgentSetup: Record "Room Planning Agent Setup")
-    var
-        Agent: Codeunit Agent;
-        TempAgentAccessControl: Record "Access Control Buffer" temporary;
-    begin
-        // TODO: Override access control install logic if needed
-        // Agent.UpdateAccessControl(RoomPlanningAgentSetup."User Security ID", TempAgentAccessControl);
-    end;
-
-    local procedure InstallAgentSetup(var RoomPlanningAgentSetup: Record "Room Planning Agent Setup")
-    begin
-        // TODO: Custom install logic for Room Planning Agent Setup record if needed
     end;
 
     local procedure InstallAgentLocalization(var RoomPlanningAgentSetup: Record "Room Planning Agent Setup")
@@ -74,16 +59,15 @@ codeunit 50829 "Room Planning Agent Install"
     local procedure RegisterCapability()
     var
         CopilotCapability: Codeunit "Copilot Capability";
-        LearnMoreUrlTxt: Label 'link-to-my-documentation', Locked = true; // TODO: Update with actual documentation URL
+        LearnMoreUrlTxt: Label 'https://learn.microsoft.com/dynamics365/business-central/dev-itpro/ai/ai-agent-sdk-overview', Locked = true;
     begin
-        if CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Room Planning Agent Capability") then
-            CopilotCapability.UnregisterCapability(Enum::"Copilot Capability"::"Room Planning Agent Capability");
+        if CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Room Planning Agent") then
+            CopilotCapability.UnregisterCapability(Enum::"Copilot Capability"::"Room Planning Agent");
 
-        // Register capability
         CopilotCapability.RegisterCapability(
-        Enum::"Copilot Capability"::"Room Planning Agent Capability",
-        Enum::"Copilot Availability"::Preview,
-        "Copilot Billing Type"::"Microsoft Billed",
-        LearnMoreUrlTxt)
+            Enum::"Copilot Capability"::"Room Planning Agent",
+            Enum::"Copilot Availability"::Preview,
+            "Copilot Billing Type"::"Microsoft Billed",
+            LearnMoreUrlTxt);
     end;
 }

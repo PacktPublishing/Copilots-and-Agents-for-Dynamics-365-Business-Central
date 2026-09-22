@@ -1,14 +1,14 @@
-page 50830 "Room Planning Agent KPI"
+namespace Packt;
+
+page 50852 "Room Planning Agent KPI"
 {
-    PageType = CardPart;
     ApplicationArea = All;
-    UsageCategory = Administration;
     Caption = 'Room Planning Agent Summary';
-    SourceTable = "Room Planning Agent KPI";
     Editable = false;
     Extensible = false;
-    InherentEntitlements = X;
-    InherentPermissions = X;
+    PageType = CardPart;
+    SourceTable = "Room Planning Agent KPI";
+    UsageCategory = Administration;
 
     layout
     {
@@ -32,12 +32,6 @@ page 50830 "Room Planning Agent KPI"
         GetRelevantAgent();
     end;
 
-    /// <summary>
-    /// Retrieves the relevant agent's KPI record for display.
-    /// This page is launched via IAgentMetadata.GetSummaryPageId(). The platform sets a filter on the
-    /// "User Security ID" field before opening the page, so the source record may not be fully populated
-    /// on open - the filter is evaluated here to resolve and load the correct record.
-    /// </summary>
     local procedure GetRelevantAgent()
     var
         UserSecurityIDFilter: Text;
