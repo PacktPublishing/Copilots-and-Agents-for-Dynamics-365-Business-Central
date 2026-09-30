@@ -1,0 +1,288 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "actions": {
+            "Customer_Service_Agent": {
+                "type": "Agent",
+                "inputs": {
+                    "parameters": {
+                        "deploymentId": "gpt-4.1",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "You are a customer service agent for CONTOSO Events. Start by introducing yourself and understanding the customer's request. Based on their needs, you can hand off to specialized agents within this conversation.\n\nYour role is to:\n1. Greet customers professionally\n2. Understand their request or issue\n3. Hand off to appropriate specialists when needed\n4. Always maintain friendly, professional tone\n\nYou can hand off to specialized agents for complex issues that require focused expertise.\n\nYou are part of a multi-agent system designed to make agent coordination and execution easy. Agents uses two primary abstraction: **Agents** and **Handoffs**. An agent encompasses instructions and tools and can hand off a conversation to another agent when appropriate. Handoffs are achieved by calling a handoff function, generally named `handoff_`. Transfers between agents are handled seamlessly in the background; do not mention or draw attention to these transfers in your conversation with the user."
+                            }
+                        ],
+                        "agentModelType": "MicrosoftFoundry",
+                        "agentModelSettings": {
+                            "agentHistoryReductionSettings": {
+                                "agentHistoryReductionType": "maximumTokenCountReduction",
+                                "maximumTokenCount": 128000
+                            },
+                            "deploymentModelProperties": {
+                                "name": "gpt-4.1",
+                                "format": "OpenAI",
+                                "version": "2025-04-14"
+                            }
+                        }
+                    },
+                    "modelConfigurations": {
+                        "model1": {
+                            "referenceName": "agent"
+                        }
+                    }
+                },
+                "tools": {
+                    "RefundSpecialistHandoff": {
+                        "actions": {
+                            "handoff_b9978e6f": {
+                                "type": "AgentHandOff",
+                                "inputs": {
+                                    "name": "Refund_Specialist"
+                                }
+                            }
+                        },
+                        "description": "Hand off to the refund specialist for refunds, returns, exchanges, and billing issues. This agent specializes in understanding refund policies, processing returns, and resolving billing disputes with empathy and efficiency."
+                    },
+                    "SalesSpecialistHandoff": {
+                        "actions": {
+                            "handoff_9672c50c": {
+                                "type": "AgentHandOff",
+                                "inputs": {
+                                    "name": "Sales_Specialist"
+                                }
+                            }
+                        },
+                        "description": "Hand off to the sales specialist for product inquiries, purchase assistance, and sales consultations. This agent excels at understanding customer needs, recommending products, and facilitating purchases."
+                    }
+                },
+                "runAfter": {
+                    "When_a_new_chat_session_starts": [
+                        "Succeeded"
+                    ]
+                }
+            },
+            "Refund_Specialist": {
+                "type": "Agent",
+                "inputs": {
+                    "parameters": {
+                        "deploymentId": "gpt-4.1",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "You are a refund specialist for CONTOSO Events. Handle refund requests, returns, and billing issues with empathy and efficiency.\n\nYour process:\n1. Understand the customer's refund reason\n2. Propose appropriate solutions (exchanges, fixes, refunds)\n3. If refund is needed, look up item details and execute refund\n4. Always be understanding and helpful with refund requests\n\nYou can hand back to the main agent if the request is outside your refund expertise.\n\nYou are part of a multi-agent system designed to make agent coordination and execution easy. Agents uses two primary abstraction: **Agents** and **Handoffs**. An agent encompasses instructions and tools and can hand off a conversation to another agent when appropriate. Handoffs are achieved by calling a handoff function, generally named `handoff_`. Transfers between agents are handled seamlessly in the background; do not mention or draw attention to these transfers in your conversation with the user."
+                            }
+                        ],
+                        "agentModelType": "MicrosoftFoundry",
+                        "agentModelSettings": {
+                            "agentHistoryReductionSettings": {
+                                "agentHistoryReductionType": "maximumTokenCountReduction",
+                                "maximumTokenCount": 128000
+                            },
+                            "deploymentModelProperties": {
+                                "name": "gpt-4.1",
+                                "format": "OpenAI",
+                                "version": "2025-04-14"
+                            }
+                        }
+                    },
+                    "modelConfigurations": {
+                        "model1": {
+                            "referenceName": "agent"
+                        }
+                    }
+                },
+                "tools": {
+                    "CustomerServiceHandoff": {
+                        "actions": {
+                            "handoff_d49611a7": {
+                                "type": "AgentHandOff",
+                                "inputs": {
+                                    "name": "Customer_Service_Agent"
+                                }
+                            }
+                        },
+                        "description": "Return control to the main customer service agent when the customer's request is outside of refund, return, or billing domains. Use this when customers ask about sales, product inquiries, general questions, or need services that are not refund-related."
+                    },
+                    "look_up_item": {
+                        "actions": {
+                            "Compose": {
+                                "type": "Compose",
+                                "inputs": {
+                                    "item_id": "@agentParameters('id')",
+                                    "status": "found"
+                                }
+                            }
+                        },
+                        "description": "Use to find item ID. Search query can be a description or keywords.",
+                        "agentParameterSchema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "description": "The item id"
+                                }
+                            },
+                            "required": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "execute_refund": {
+                        "actions": {
+                            "Compose_1": {
+                                "type": "Compose",
+                                "inputs": {
+                                    "refund_status": "success",
+                                    "refund_amount": 120.58,
+                                    "confirmation": "Refund processed successfully"
+                                }
+                            }
+                        },
+                        "description": "Execute refund for validated items after confirming eligibility",
+                        "agentParameterSchema": {
+                            "type": "object",
+                            "properties": {
+                                "order_id": {
+                                    "type": "string",
+                                    "description": "The order id"
+                                }
+                            },
+                            "required": [
+                                "order_id"
+                            ]
+                        }
+                    }
+                },
+                "runAfter": {}
+            },
+            "Sales_Specialist": {
+                "type": "Agent",
+                "inputs": {
+                    "parameters": {
+                        "deploymentId": "gpt-4.1",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "You are a sales specialist for CONTOSO Events. Help customers with product inquiries and sales.\n\nYour sales process:\n1. Understand customer needs and problems\n2. Recommend appropriate products\n3. Discuss features and benefits\n4. Handle pricing and facilitate orders when ready\n5. Hand back to main agent for non-sales issues\n\nBe enthusiastic but not pushy. Focus on solving customer problems.\n\nYou are part of a multi-agent system designed to make agent coordination and execution easy. Agents uses two primary abstraction: **Agents** and **Handoffs**. An agent encompasses instructions and tools and can hand off a conversation to another agent when appropriate. Handoffs are achieved by calling a handoff function, generally named `handoff_`. Transfers between agents are handled seamlessly in the background; do not mention or draw attention to these transfers in your conversation with the user."
+                            }
+                        ],
+                        "agentModelType": "MicrosoftFoundry",
+                        "agentModelSettings": {
+                            "agentHistoryReductionSettings": {
+                                "agentHistoryReductionType": "maximumTokenCountReduction",
+                                "maximumTokenCount": 128000
+                            },
+                            "deploymentModelProperties": {
+                                "name": "gpt-4.1",
+                                "format": "OpenAI",
+                                "version": "2025-04-14"
+                            }
+                        }
+                    },
+                    "modelConfigurations": {
+                        "model1": {
+                            "referenceName": "agent"
+                        }
+                    }
+                },
+                "tools": {
+                    "search_products": {
+                        "actions": {
+                            "Compose_2": {
+                                "type": "Compose",
+                                "inputs": {
+                                    "products": [
+                                        {
+                                            "id": "EMEA2026",
+                                            "name": "Directions EMEA 2026",
+                                            "price": 1500.00,
+                                            "description": "Directions EMEA Conference 2026"
+                                        },
+                                        {
+                                            "id": "AICONF2027",
+                                            "name": "AI Conference 2027",
+                                            "price": 1100.00,
+                                            "description": "AI Conference 2027"
+                                        },
+                                        {
+                                            "id": "BCTECHDAYS2027",
+                                            "name": "BC Tech Days 2027",
+                                            "price": 1200.00,
+                                            "description": "BC Tech Days Conference 2027"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "description": "Search product catalog based on customer needs and preferences",
+                        "agentParameterSchema": {
+                            "type": "object",
+                            "properties": {
+                                "search_string": {
+                                    "type": "string",
+                                    "description": "The search string"
+                                }
+                            },
+                            "required": [
+                                "search_string"
+                            ]
+                        }
+                    },
+                    "execute_order": {
+                        "actions": {
+                            "Compose_3": {
+                                "type": "Compose",
+                                "inputs": {
+                                    "order_status": "success",
+                                    "order_id": "@{guid()}",
+                                    "quantity": "@agentParameters('quantity')",
+                                    "productid": "@{agentParameters('id')}"
+                                }
+                            }
+                        },
+                        "description": "Execute customer orders with product details, pricing, and shipping. Price should be in USD.",
+                        "agentParameterSchema": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "description": "the product id"
+                                },
+                                "quantity": {
+                                    "type": "integer",
+                                    "description": "The order quantity"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "quantity"
+                            ]
+                        }
+                    },
+                    "CustomerServiceHandoff-1": {
+                        "actions": {
+                            "handoff_f8fb80d4": {
+                                "type": "AgentHandOff",
+                                "inputs": {
+                                    "name": "Customer_Service_Agent"
+                                }
+                            }
+                        },
+                        "description": "Return control to the main customer service agent when the customer's request is outside of sales, product recommendations, or purchase assistance. Use this when customers ask about refunds, technical support, billing issues, or other non-sales topics."
+                    }
+                },
+                "runAfter": {}
+            }
+        },
+        "outputs": {},
+        "triggers": {
+            "When_a_new_chat_session_starts": {
+                "type": "Request",
+                "kind": "Agent"
+            }
+        }
+    },
+    "kind": "Agent"
+}
