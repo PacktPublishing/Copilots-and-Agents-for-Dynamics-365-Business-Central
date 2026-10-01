@@ -85,22 +85,18 @@ codeunit 50607 "Save Agenda" implements "AOAI Function"
 
     procedure Execute(Arguments: JsonObject): Variant
     var
-        ScheduleToken: JsonToken;
         ScheduleArray: JsonArray;
         ItemToken: JsonToken;
-        i: Integer;
     begin
         AgendaProposal.Reset();
         AgendaProposal.DeleteAll();
 
-        if not Arguments.Get('schedule', ScheduleToken) then
+        if not Arguments.Contains('schedule') then
             exit('No schedule provided.');
 
-        ScheduleArray := ScheduleToken.AsArray();
-        for i := 0 to ScheduleArray.Count() - 1 do begin
-            ScheduleArray.Get(i, ItemToken);
+        ScheduleArray := Arguments.GetArray('schedule');
+        foreach ItemToken in ScheduleArray do
             InsertProposal(ItemToken.AsObject());
-        end;
 
         exit('Saved ' + Format(ScheduleArray.Count()) + ' sessions to the agenda proposal.');
     end;

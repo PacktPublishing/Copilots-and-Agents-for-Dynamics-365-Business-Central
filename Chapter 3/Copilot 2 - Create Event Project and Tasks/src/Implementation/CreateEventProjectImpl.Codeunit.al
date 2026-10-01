@@ -137,20 +137,16 @@ Use %1 as the project start date. Generate at least 4 tasks. Use yyyy-mm-dd for 
 
     local procedure InsertTaskRows(Root: JsonObject; var EventProjectProposal: Record "Event Project Proposal"; JobDescription: Text[100]; var LineNo: Integer)
     var
-        TasksToken: JsonToken;
         TaskElementToken: JsonToken;
         TasksArray: JsonArray;
         TaskObjText: Text;
-        i: Integer;
     begin
-        if not Root.Get('tasks', TasksToken) then
+        if not Root.Contains('tasks') then
             Error(MissingTasksErr);
 
-        TasksArray := TasksToken.AsArray();
+        TasksArray := Root.GetArray('tasks');
 
-        for i := 0 to TasksArray.Count() - 1 do begin
-            if not TasksArray.Get(i, TaskElementToken) then
-                continue;
+        foreach TaskElementToken in TasksArray do begin
             if not TaskElementToken.IsObject() then
                 continue;
 
