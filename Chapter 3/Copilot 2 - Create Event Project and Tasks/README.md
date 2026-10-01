@@ -14,13 +14,13 @@ Second copilot demo for **Chapter 3: Creating Copilots in AL with the AI Develop
 
 1. Build and publish **Chapter 3 - Common** first; add its output to this project’s `.alpackages`.
 2. Open this folder in VS Code.
-3. Connect to Business Central 27.x and publish.
+3. Connect to Business Central 27.3 or later and publish.
 4. In BC, open **Job List** and use the **Create Event Project** action (Prompting group, Sparkle icon).
 5. Enter or paste an Event Brief, choose **Generate**, review the proposed project and tasks, then **Keep it** to create the Job and tasks in BC, or **Discard it** to close without saving.
 
 ## Requirements
 
-- Business Central 27.x (Copilot Toolkit; 27.2+ for latest features).
+- Business Central 27.3 or later.
 - **Chapter 3 - Common** app (dependency; provides Event Copilot Setup).
 - **Azure OpenAI** configured in **Event Copilot Setup** (Common app). Open Event Copilot Setup in BC and enter endpoint, deployment name, and secret key. The Create Event Project capability must be enabled for your environment.
 

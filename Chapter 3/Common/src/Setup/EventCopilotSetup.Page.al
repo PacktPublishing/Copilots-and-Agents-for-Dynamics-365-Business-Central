@@ -24,8 +24,8 @@ page 50201 "Event Copilot Setup"
                 field(Deployment; Rec.Deployment)
                 {
                     ApplicationArea = All;
-                    InstructionalText = 'Enter the deployment name (e.g. gpt-4o).';
-                    ToolTip = 'Specifies the chat completions deployment name (e.g. gpt-4o) used by the Event Copilots.';
+                    InstructionalText = 'Enter the deployment name (e.g. gpt-6-sol).';
+                    ToolTip = 'Specifies the chat completions deployment name (e.g. gpt-6-sol) used by the Event Copilots.';
                 }
                 field(SecretKey; SecretKey)
                 {

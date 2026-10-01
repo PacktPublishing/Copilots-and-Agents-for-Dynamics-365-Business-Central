@@ -50,7 +50,7 @@ Open the **Job List** page, select an event project, and choose **Import Session
 You can use the [sample Excel file](https://github.com/PacktPublishing/AI-solutions-for-Dynamics-365-Business-Central/blob/main/Chapter%203/Copilot%203%20-%20Import%20Session%20Proposals%20from%20Excel/Examples/SessionProposals.xlsx) from the repository.
 
 1. Build and publish **Chapter 3 – Common** first; add the `.app` file to `.alpackages`.
-2. Open this folder in VS Code and publish to BC 27.x.
+2. Open this folder in VS Code and publish to BC 27.3 or later.
 3. Open **Event Copilot Setup** (search in BC) and enter your Azure OpenAI Endpoint, Deployment, and Secret Key.
 4. On the **Job List**, select a project and choose **Import Session Proposals** from the Prompting area.
 5. Optionally set **Data Exposure** (None / Excel / Excel and Business Central) to control how much data is sent to the AI for mapping.
@@ -60,6 +60,6 @@ You can use the [sample Excel file](https://github.com/PacktPublishing/AI-soluti
 
 ## Requirements
 
-- Business Central 27.x / runtime 16.0
-- Azure OpenAI resource with a chat completions deployment (e.g. `gpt-4o`)
+- Business Central 27.3 or later / runtime 16.0
+- Azure OpenAI resource with a chat completions deployment (e.g. `gpt-6-sol`)
 - Chapter 3 – Common app published

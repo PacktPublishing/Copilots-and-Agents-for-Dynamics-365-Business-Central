@@ -19,12 +19,12 @@ Build and publish this app **first** so that the copilot apps (Plan Event, Event
 
 ## Requirements
 
-- Business Central 27.x (platform and application 27.0.0.0 or later).
+- Business Central 27.3 or later.
 - AL extension for VS Code.
 
 ## How to run
 
 1. Open this folder in VS Code.
-2. Restore symbol references (or ensure BC 27.x base application symbols are available).
+2. Restore symbol references (or ensure BC 27.3 or later base application symbols are available).
 3. Build (Ctrl+Shift+B) and publish to your BC server/sandbox.
 4. Use the same server when building the copilot apps that depend on Common.

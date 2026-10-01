@@ -18,6 +18,6 @@ First copilot demo for **Chapter 3: Creating Copilots in AL with the AI Developm
 
 ## Requirements
 
-- Business Central 27.x.
+- Business Central 27.3 or later.
 - **Chapter 3 - Common** app (dependency; provides Event Copilot Setup table and page).
 - Azure OpenAI configured in Event Copilot Setup (Common app).

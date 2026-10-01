@@ -52,12 +52,12 @@ This copilot introduces **tool calling** (function calling): the AI model calls 
 
 1. Build and publish **Chapter 3 – Common** (provides `Event Session`, `Event Session Status`, and `Event Copilot Setup`).
 2. Optionally publish **Copilot 3 – Import Session Proposals from Excel** so session data exists in Draft status, or seed the `Event Session` table manually.
-3. Open this folder in VS Code and publish to BC 27.x.
+3. Open this folder in VS Code and publish to BC 27.3 or later.
 4. Open **Event Copilot Setup** and configure the Azure OpenAI endpoint, deployment, and secret key.
 5. Open the **Job List**, select an event project that has start and end dates, and choose **Build Conference Agenda**.
 
 ## Requirements
 
-- Business Central 27.2 or later (tool calling support in the Copilot Toolkit).
+- Business Central 27.3 or later.
 - **Chapter 3 – Common** app (dependency: provides Event Session, Event Session Status, Event Copilot Setup).
-- Azure OpenAI resource with a model that supports function calling (e.g., GPT-4o).
+- Azure OpenAI resource with a model that supports function calling (e.g., `gpt-6-sol`).
