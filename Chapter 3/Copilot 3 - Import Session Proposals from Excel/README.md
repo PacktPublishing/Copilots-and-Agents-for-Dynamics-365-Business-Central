@@ -47,6 +47,8 @@ Open the **Job List** page, select an event project, and choose **Import Session
 
 ## How to run
 
+You can use the [sample Excel file](https://github.com/PacktPublishing/AI-solutions-for-Dynamics-365-Business-Central/blob/main/Chapter%203/Copilot%203%20-%20Import%20Session%20Proposals%20from%20Excel/Examples/SessionProposals.xlsx) from the repository.
+
 1. Build and publish **Chapter 3 – Common** first; add the `.app` file to `.alpackages`.
 2. Open this folder in VS Code and publish to BC 27.x.
 3. Open **Event Copilot Setup** (search in BC) and enter your Azure OpenAI Endpoint, Deployment, and Secret Key.
