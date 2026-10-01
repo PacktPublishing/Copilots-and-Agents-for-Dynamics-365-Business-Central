@@ -55,6 +55,12 @@ page 50405 "Create Event Project"
                         ShowMandatory = true;
                         ToolTip = 'Specifies the customer who pays for the project. Select another customer when Copilot cannot find the correct match.';
 
+                        trigger OnValidate()
+                        begin
+                            CustomerProposal.Validate("Suggested Customer Name");
+                            CurrPage.Update(false);
+                        end;
+
                         trigger OnLookup(var Text: Text): Boolean
                         begin
                             exit(CustomerProposal.LookupSuggestedCustomerName(Text));

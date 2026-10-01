@@ -48,6 +48,9 @@ table 50402 "Event Project Proposal"
                 Customer: Record Customer;
                 LookupStateManager: Codeunit "Lookup State Manager";
             begin
+                if "Suggested Customer Name" = '' then
+                    LookupStateManager.ClearSavedRecord();
+
                 if LookupStateManager.IsRecordSaved() then begin
                     Customer := LookupStateManager.GetSavedRecord();
                     if Customer."No." <> '' then begin
@@ -55,11 +58,6 @@ table 50402 "Event Project Proposal"
                         Validate("Suggested Customer No.", Customer."No.");
                         exit;
                     end;
-                end;
-
-                if "Suggested Customer Name" = '' then begin
-                    Validate("Suggested Customer No.", '');
-                    exit;
                 end;
 
                 if ShouldSearchForCustomerByName("Suggested Customer No.") then
