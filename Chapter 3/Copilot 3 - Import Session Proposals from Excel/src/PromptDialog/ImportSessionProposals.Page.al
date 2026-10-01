@@ -171,6 +171,7 @@ page 50505 "Import Session Proposals"
         if not Rec.IsEmpty() then
             Rec.FindLast();
 
+        Rec.Init();
         Rec."Generation Id" := Rec."Generation Id" + 1;
         Rec."Data Exposure" := DataExposure;
         Rec.Insert();
