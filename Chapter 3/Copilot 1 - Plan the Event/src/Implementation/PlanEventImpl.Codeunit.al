@@ -6,9 +6,10 @@ codeunit 50303 "Plan Event Impl"
         AOAIChatMessages: Codeunit "AOAI Chat Messages";
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
         AOAIOperationResponse: Codeunit "AOAI Operation Response";
+        CopilotCapabilityDisabledErr: Label 'The Plan Event copilot has been turned off by an administrator.';
     begin
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Plan Event") then
-            exit('');
+            Error(CopilotCapabilityDisabledErr);
 
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Plan Event");
         SetAzureOpenAIAuthorization(AzureOpenAI);

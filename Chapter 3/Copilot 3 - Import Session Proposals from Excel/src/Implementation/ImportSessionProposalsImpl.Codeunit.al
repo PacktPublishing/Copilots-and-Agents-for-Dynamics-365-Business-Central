@@ -12,9 +12,10 @@ codeunit 50504 "Import Session Proposals Impl"
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
         AOAIOperationResponse: Codeunit "AOAI Operation Response";
         ResponseText: Text;
+        CopilotCapabilityDisabledErr: Label 'The Import Session Proposals copilot has been turned off by an administrator.';
     begin
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Import Session Proposals") then
-            exit;
+            Error(CopilotCapabilityDisabledErr);
 
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Import Session Proposals");
         SetAzureOpenAIAuthorization(AzureOpenAI);

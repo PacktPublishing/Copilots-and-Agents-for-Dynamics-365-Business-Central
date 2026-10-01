@@ -7,9 +7,10 @@ codeunit 50403 "Create Event Project Impl"
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
         AOAIOperationResponse: Codeunit "AOAI Operation Response";
         ResponseText: Text;
+        CopilotCapabilityDisabledErr: Label 'The Create Event Project copilot has been turned off by an administrator.';
     begin
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Create Event Project") then
-            exit;
+            Error(CopilotCapabilityDisabledErr);
 
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Create Event Project");
         SetAzureOpenAIAuthorization(AzureOpenAI);

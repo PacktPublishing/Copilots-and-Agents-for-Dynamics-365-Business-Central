@@ -10,9 +10,10 @@ codeunit 50609 "Build Agenda Impl"
         GetEventInfoTool: Codeunit "Get Event Info";
         SaveAgendaTool: Codeunit "Save Agenda";
         GetCurrentAgendaTool: Codeunit "Get Current Agenda";
+        CopilotCapabilityDisabledErr: Label 'The Build Conference Agenda copilot has been turned off by an administrator.';
     begin
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Build Conference Agenda") then
-            exit('');
+            Error(CopilotCapabilityDisabledErr);
 
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Build Conference Agenda");
         SetAzureOpenAIAuthorization(AzureOpenAI);
