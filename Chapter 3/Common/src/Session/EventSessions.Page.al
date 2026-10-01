@@ -1,3 +1,5 @@
+namespace Packt;
+
 page 50212 "Event Sessions"
 {
     ApplicationArea = All;

@@ -1,3 +1,7 @@
+namespace Packt;
+
+using Microsoft.Projects.Project.Job;
+
 table 50211 "Event Session"
 {
     Caption = 'Event Session';

@@ -1,3 +1,9 @@
+namespace Packt;
+
+using Microsoft.Sales.Customer;
+using System.AI;
+using System.Text;
+
 codeunit 50403 "Create Event Project Impl"
 {
     procedure GenerateEventProject(EventBrief: Text; var JobDescription: Text[100]; var JobFullDescription: Text; var CustomerName: Text[100]; var EventProjectProposal: Record "Event Project Proposal")

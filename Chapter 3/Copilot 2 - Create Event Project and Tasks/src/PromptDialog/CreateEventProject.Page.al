@@ -1,3 +1,5 @@
+namespace Packt;
+
 page 50405 "Create Event Project"
 {
     PageType = PromptDialog;

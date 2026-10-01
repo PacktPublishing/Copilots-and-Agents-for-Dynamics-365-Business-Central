@@ -1,3 +1,8 @@
+namespace Packt;
+
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
+
 codeunit 50404 "Save Event Project Impl"
 {
     procedure ApplyEventProject(var EventProjectProposal: Record "Event Project Proposal")

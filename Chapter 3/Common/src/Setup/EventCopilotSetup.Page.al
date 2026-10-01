@@ -1,3 +1,5 @@
+namespace Packt;
+
 page 50201 "Event Copilot Setup"
 {
     Caption = 'Event Copilot Setup';

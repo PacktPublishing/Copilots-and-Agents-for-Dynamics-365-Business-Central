@@ -1,3 +1,8 @@
+namespace Packt;
+
+using System.AI;
+using System.Environment;
+
 codeunit 50401 "Create Event Project Install"
 {
     Subtype = Install;

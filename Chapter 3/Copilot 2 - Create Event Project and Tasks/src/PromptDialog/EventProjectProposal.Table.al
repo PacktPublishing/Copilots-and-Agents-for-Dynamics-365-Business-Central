@@ -1,3 +1,9 @@
+namespace Packt;
+
+using Microsoft.Projects.Project.Job;
+using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
+
 table 50402 "Event Project Proposal"
 {
     Caption = 'Event Project Proposal';

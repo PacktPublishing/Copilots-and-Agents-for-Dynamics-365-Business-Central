@@ -1,3 +1,7 @@
+namespace Packt;
+
+using Microsoft.Projects.Project.Job;
+
 pageextension 50213 "Event Sessions Job List Ext" extends "Job List"
 {
     actions

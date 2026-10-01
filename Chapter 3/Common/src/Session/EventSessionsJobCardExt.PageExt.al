@@ -1,3 +1,7 @@
+namespace Packt;
+
+using Microsoft.Projects.Project.Job;
+
 pageextension 50214 "Event Sessions Job Card Ext" extends "Job Card"
 {
     actions

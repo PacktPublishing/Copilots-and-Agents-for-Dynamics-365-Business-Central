@@ -1,3 +1,5 @@
+namespace Packt;
+
 table 50200 "Event Copilot Setup"
 {
     Description = 'Azure OpenAI setup for Chapter 3 copilots.';

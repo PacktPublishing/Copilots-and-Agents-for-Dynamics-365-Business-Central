@@ -1,3 +1,5 @@
+namespace Packt;
+
 permissionset 50202 "Event Copilot Admin"
 {
     Assignable = true;

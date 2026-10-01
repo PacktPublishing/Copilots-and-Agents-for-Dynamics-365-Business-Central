@@ -1,3 +1,5 @@
+namespace Packt;
+
 page 50406 "Event Project Proposal Subpart"
 {
     PageType = ListPart;

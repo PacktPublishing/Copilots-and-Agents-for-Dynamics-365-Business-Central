@@ -1,3 +1,5 @@
+namespace Packt;
+
 enum 50210 "Event Session Status"
 {
     Caption = 'Event Session Status';
