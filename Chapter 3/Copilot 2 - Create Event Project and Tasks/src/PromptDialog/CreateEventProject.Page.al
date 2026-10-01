@@ -41,14 +41,14 @@ page 50405 "Create Event Project"
                     GridLayout = Columns;
                     ShowCaption = false;
 
-                    field(ExtractedCustomer; CustomerProposal."Extracted Customer")
+                    field(ExtractedCustomer; TempCustomerProposal."Extracted Customer")
                     {
                         ApplicationArea = All;
                         Caption = 'Extracted';
                         Editable = false;
                         ToolTip = 'Specifies the customer name extracted by Copilot from the Event Brief.';
                     }
-                    field(SuggestedCustomer; CustomerProposal."Suggested Customer Name")
+                    field(SuggestedCustomer; TempCustomerProposal."Suggested Customer Name")
                     {
                         ApplicationArea = All;
                         Caption = 'Suggested';
@@ -57,13 +57,13 @@ page 50405 "Create Event Project"
 
                         trigger OnValidate()
                         begin
-                            CustomerProposal.Validate("Suggested Customer Name");
+                            TempCustomerProposal.Validate("Suggested Customer Name");
                             CurrPage.Update(false);
                         end;
 
                         trigger OnLookup(var Text: Text): Boolean
                         begin
-                            exit(CustomerProposal.LookupSuggestedCustomerName(Text));
+                            exit(TempCustomerProposal.LookupSuggestedCustomerName(Text));
                         end;
                     }
                 }
@@ -116,48 +116,48 @@ page 50405 "Create Event Project"
 
     local procedure CheckMandatoryFields()
     begin
-        if CustomerProposal."Suggested Customer No." = '' then
+        if TempCustomerProposal."Suggested Customer No." = '' then
             Error(SuggestedCustomerNoRequiredErr);
     end;
 
     local procedure GenerateEventProject()
     var
-        EventProjectProposal: Record "Event Project Proposal";
+        TempEventProjectProposal: Record "Event Project Proposal";
         CreateEventProjectImpl: Codeunit "Create Event Project Impl";
         ExtractedCustomerName: Text[100];
     begin
-        Clear(CustomerProposal);
-        CreateEventProjectImpl.GenerateEventProject(InputEventBrief, JobDescription, JobFullDescription, ExtractedCustomerName, EventProjectProposal);
+        Clear(TempCustomerProposal);
+        CreateEventProjectImpl.GenerateEventProject(InputEventBrief, JobDescription, JobFullDescription, ExtractedCustomerName, TempEventProjectProposal);
         SetSuggestedCustomer(ExtractedCustomerName);
-        CurrPage.ProposalDetails.Page.Load(EventProjectProposal);
+        CurrPage.ProposalDetails.Page.Load(TempEventProjectProposal);
     end;
 
     local procedure SetSuggestedCustomer(ExtractedCustomerName: Text[100])
     var
         CreateEventProjectImpl: Codeunit "Create Event Project Impl";
     begin
-        CustomerProposal."Extracted Customer" := ExtractedCustomerName;
-        CustomerProposal.Validate("Suggested Customer No.", CreateEventProjectImpl.FindCustomerBySearchKeyword(ExtractedCustomerName));
+        TempCustomerProposal."Extracted Customer" := ExtractedCustomerName;
+        TempCustomerProposal.Validate("Suggested Customer No.", CreateEventProjectImpl.FindCustomerBySearchKeyword(ExtractedCustomerName));
     end;
 
     local procedure ApplyEventProject()
     var
-        EventProjectProposal: Record "Event Project Proposal";
+        TempEventProjectProposal: Record "Event Project Proposal";
         SaveEventProjectImpl: Codeunit "Save Event Project Impl";
     begin
-        CurrPage.ProposalDetails.Page.GetRecords(EventProjectProposal);
-        EventProjectProposal.FindFirst();
-        EventProjectProposal."Extracted Customer" := CustomerProposal."Extracted Customer";
-        EventProjectProposal."Suggested Customer No." := CustomerProposal."Suggested Customer No.";
-        EventProjectProposal."Suggested Customer Name" := CustomerProposal."Suggested Customer Name";
-        EventProjectProposal.Modify();
-        SaveEventProjectImpl.ApplyEventProject(EventProjectProposal);
+        CurrPage.ProposalDetails.Page.GetRecords(TempEventProjectProposal);
+        TempEventProjectProposal.FindFirst();
+        TempEventProjectProposal."Extracted Customer" := TempCustomerProposal."Extracted Customer";
+        TempEventProjectProposal."Suggested Customer No." := TempCustomerProposal."Suggested Customer No.";
+        TempEventProjectProposal."Suggested Customer Name" := TempCustomerProposal."Suggested Customer Name";
+        TempEventProjectProposal.Modify();
+        SaveEventProjectImpl.ApplyEventProject(TempEventProjectProposal);
     end;
 
     var
+        TempCustomerProposal: Record "Event Project Proposal";
         InputEventBrief: Text;
         JobDescription: Text[100];
         JobFullDescription: Text;
-        CustomerProposal: Record "Event Project Proposal";
         SuggestedCustomerNoRequiredErr: Label 'Select a Suggested Customer No. before keeping the proposal.';
 }

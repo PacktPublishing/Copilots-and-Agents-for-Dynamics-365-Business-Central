@@ -52,7 +52,7 @@ page 50302 "Plan Event"
     }
 
     var
+        PlanEventImpl: Codeunit "Plan Event Impl";
         EventBriefText: Text;
         PlanningStepsText: Text;
-        PlanEventImpl: Codeunit "Plan Event Impl";
 }
