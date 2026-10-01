@@ -19,6 +19,10 @@ codeunit 50601 "Build Agenda Install"
         if CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Build Conference Agenda") then
             exit;
 
-        CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Build Conference Agenda", LearnMoreUrlTxt);
+        CopilotCapability.RegisterCapability(
+            Enum::"Copilot Capability"::"Build Conference Agenda",
+            Enum::"Copilot Availability"::Preview,
+            Enum::"Copilot Billing Type"::"Not Billed",
+            LearnMoreUrlTxt);
     end;
 }

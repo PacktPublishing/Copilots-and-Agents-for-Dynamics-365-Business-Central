@@ -16,6 +16,10 @@ codeunit 50501 "Import Sess. Proposals Install"
         if not EnvironmentInformation.IsSaaS() then
             exit;
         if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Import Session Proposals") then
-            CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Import Session Proposals", LearnMoreUrlTxt);
+            CopilotCapability.RegisterCapability(
+                Enum::"Copilot Capability"::"Import Session Proposals",
+                Enum::"Copilot Availability"::Preview,
+                Enum::"Copilot Billing Type"::"Not Billed",
+                LearnMoreUrlTxt);
     end;
 }

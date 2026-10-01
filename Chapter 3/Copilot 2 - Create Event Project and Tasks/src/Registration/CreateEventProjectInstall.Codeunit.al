@@ -24,6 +24,10 @@ codeunit 50401 "Create Event Project Install"
         if CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Create Event Project") then
             exit;
 
-        CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Create Event Project", LearnMoreUrlTxt);
+        CopilotCapability.RegisterCapability(
+            Enum::"Copilot Capability"::"Create Event Project",
+            Enum::"Copilot Availability"::Preview,
+            Enum::"Copilot Billing Type"::"Not Billed",
+            LearnMoreUrlTxt);
     end;
 }

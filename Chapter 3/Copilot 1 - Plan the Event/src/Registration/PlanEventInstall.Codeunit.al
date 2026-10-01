@@ -19,6 +19,10 @@ codeunit 50301 "Plan Event Install"
         if CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Plan Event") then
             exit;
 
-        CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Plan Event", LearnMoreUrlTxt);
+        CopilotCapability.RegisterCapability(
+            Enum::"Copilot Capability"::"Plan Event",
+            Enum::"Copilot Availability"::Preview,
+            Enum::"Copilot Billing Type"::"Not Billed",
+            LearnMoreUrlTxt);
     end;
 }
