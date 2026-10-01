@@ -15,7 +15,6 @@ codeunit 50403 "Create Event Project Impl"
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Create Event Project");
         SetAzureOpenAIAuthorization(AzureOpenAI);
 
-        AOAIChatCompletionParams.SetTemperature(0.7);
         AOAIChatCompletionParams.SetJsonMode(true);
 
         AOAIChatMessages.AddSystemMessage(GetSystemMessage());

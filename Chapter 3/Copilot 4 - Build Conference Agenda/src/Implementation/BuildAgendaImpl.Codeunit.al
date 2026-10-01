@@ -18,8 +18,6 @@ codeunit 50609 "Build Agenda Impl"
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Build Conference Agenda");
         SetAzureOpenAIAuthorization(AzureOpenAI);
 
-        AOAIChatCompletionParams.SetTemperature(0);
-
         AOAIChatMessages.AddSystemMessage(GetSystemMessage());
 
         GetSessionsTool.SetProjectCode(ProjectCode);

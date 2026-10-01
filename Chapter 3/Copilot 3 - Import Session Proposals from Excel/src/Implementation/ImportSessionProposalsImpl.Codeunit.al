@@ -20,7 +20,6 @@ codeunit 50504 "Import Session Proposals Impl"
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Import Session Proposals");
         SetAzureOpenAIAuthorization(AzureOpenAI);
 
-        AOAIChatCompletionParams.SetTemperature(0);
         AOAIChatCompletionParams.SetJsonMode(true);
 
         AOAIChatMessages.AddSystemMessage(GetSystemMessage());
