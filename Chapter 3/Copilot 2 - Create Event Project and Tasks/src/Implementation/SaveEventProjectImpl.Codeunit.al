@@ -8,7 +8,7 @@ codeunit 50404 "Save Event Project Impl"
         if not EventProjectProposal.FindSet() then
             exit;
 
-        Job := CreateJob(EventProjectProposal."Job Short Description", EventProjectProposal."Customer Name");
+        Job := CreateJob(EventProjectProposal."Job Short Description", EventProjectProposal."Suggested Customer No.");
 
         repeat
             JobTask := CreateJobTask(Job."No.", EventProjectProposal);
@@ -18,27 +18,13 @@ codeunit 50404 "Save Event Project Impl"
         until EventProjectProposal.Next() = 0;
     end;
 
-    local procedure CreateJob(JobDescription: Text[100]; CustomerSearchKeyword: Text) Job: Record Job
+    local procedure CreateJob(JobDescription: Text[100]; CustomerNo: Code[20]) Job: Record Job
     begin
         Job.Init();
         Job.Validate(Description, JobDescription);
-        Job.Validate("Bill-to Customer No.", FindCustomerBySearchKeyword(CustomerSearchKeyword));
+        Job.Validate("Bill-to Customer No.", CustomerNo);
         Job.Validate("Starting Date", FindFirstAvailableDateInAllowedLicensePeriod());
         Job.Insert(true);
-    end;
-
-    local procedure FindCustomerBySearchKeyword(CustomerSearchKeyword: Text): Code[20]
-    var
-        Customer: Record Customer;
-    begin
-        if CustomerSearchKeyword = '' then
-            exit('');
-
-        Customer.SetFilter(Name, '&&' + CustomerSearchKeyword + '*');
-        if Customer.FindFirst() then
-            exit(Customer."No.");
-
-        exit('');
     end;
 
     local procedure FindFirstAvailableDateInAllowedLicensePeriod(): Date

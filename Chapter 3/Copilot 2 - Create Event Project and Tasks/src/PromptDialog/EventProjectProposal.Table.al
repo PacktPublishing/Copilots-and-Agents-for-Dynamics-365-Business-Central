@@ -14,9 +14,57 @@ table 50402 "Event Project Proposal"
         {
             Caption = 'Job Short Description';
         }
-        field(4; "Customer Name"; Text[100])
+        field(4; "Extracted Customer"; Text[100])
         {
-            Caption = 'Customer Name';
+            Caption = 'Extracted Customer';
+        }
+        field(5; "Suggested Customer No."; Code[20])
+        {
+            Caption = 'Suggested Customer No.';
+            TableRelation = Customer;
+
+            trigger OnValidate()
+            begin
+                UpdateSuggestedCustomerName();
+            end;
+        }
+        field(6; "Suggested Customer Name"; Text[100])
+        {
+            Caption = 'Suggested Customer Name';
+            TableRelation = Customer.Name;
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                CustomerName: Text;
+            begin
+                CustomerName := "Suggested Customer Name";
+                LookupSuggestedCustomerName(CustomerName);
+                "Suggested Customer Name" := CopyStr(CustomerName, 1, MaxStrLen("Suggested Customer Name"));
+            end;
+
+            trigger OnValidate()
+            var
+                Customer: Record Customer;
+                LookupStateManager: Codeunit "Lookup State Manager";
+            begin
+                if LookupStateManager.IsRecordSaved() then begin
+                    Customer := LookupStateManager.GetSavedRecord();
+                    if Customer."No." <> '' then begin
+                        LookupStateManager.ClearSavedRecord();
+                        Validate("Suggested Customer No.", Customer."No.");
+                        exit;
+                    end;
+                end;
+
+                if "Suggested Customer Name" = '' then begin
+                    Validate("Suggested Customer No.", '');
+                    exit;
+                end;
+
+                if ShouldSearchForCustomerByName("Suggested Customer No.") then
+                    Validate("Suggested Customer No.", Customer.GetCustNo("Suggested Customer Name"));
+            end;
         }
         field(3; "Job Full Description"; Blob)
         {
@@ -72,4 +120,53 @@ table 50402 "Event Project Proposal"
             Clustered = true;
         }
     }
+
+    local procedure UpdateSuggestedCustomerName()
+    var
+        Customer: Record Customer;
+    begin
+        if "Suggested Customer No." = '' then begin
+            Clear("Suggested Customer Name");
+            exit;
+        end;
+
+        Customer.Get("Suggested Customer No.");
+        "Suggested Customer Name" := Customer.Name;
+    end;
+
+    procedure LookupSuggestedCustomerName(var CustomerName: Text): Boolean
+    var
+        Customer: Record Customer;
+        LookupStateManager: Codeunit "Lookup State Manager";
+        CustomerRecord: Variant;
+        SearchCustomerName: Text;
+    begin
+        SearchCustomerName := CustomerName;
+        if "Suggested Customer No." <> '' then
+            Customer.Get("Suggested Customer No.");
+
+        if Customer.SelectCustomer(Customer) then begin
+            if "Suggested Customer Name" = Customer.Name then
+                CustomerName := SearchCustomerName
+            else
+                CustomerName := Customer.Name;
+            CustomerRecord := Customer;
+            LookupStateManager.SaveRecord(CustomerRecord);
+            exit(true);
+        end;
+    end;
+
+    local procedure ShouldSearchForCustomerByName(CustomerNo: Code[20]): Boolean
+    var
+        Customer: Record Customer;
+    begin
+        if CustomerNo = '' then
+            exit(true);
+
+        Customer.SetLoadFields("Disable Search by Name");
+        if not Customer.Get(CustomerNo) then
+            exit(true);
+
+        exit(not Customer."Disable Search by Name");
+    end;
 }

@@ -129,6 +129,25 @@ Use %1 as the project start date. Generate at least 4 tasks. Use yyyy-mm-dd for 
             CustomerName := CopyStr(CustomerNameText, 1, MaxStrLen(CustomerName));
     end;
 
+    /// <summary>
+    /// Finds a customer from the name suggested by Copilot.
+    /// </summary>
+    /// <param name="CustomerSearchKeyword">The customer name or search keyword.</param>
+    /// <returns>The matching customer number, or an empty value when no customer is found.</returns>
+    procedure FindCustomerBySearchKeyword(CustomerSearchKeyword: Text): Code[20]
+    var
+        Customer: Record Customer;
+    begin
+        if CustomerSearchKeyword = '' then
+            exit('');
+
+        Customer.SetFilter(Name, '&&' + CustomerSearchKeyword + '*');
+        if Customer.FindFirst() then
+            exit(Customer."No.");
+
+        exit('');
+    end;
+
     local procedure ClearProposal(var EventProjectProposal: Record "Event Project Proposal")
     begin
         EventProjectProposal.Reset();
@@ -204,7 +223,7 @@ Use %1 as the project start date. Generate at least 4 tasks. Use yyyy-mm-dd for 
         EventProjectProposal.Init();
         EventProjectProposal."Job Task No." := Format(HeaderLineNo);
         EventProjectProposal."Job Short Description" := JobDescription;
-        EventProjectProposal."Customer Name" := CustomerName;
+        EventProjectProposal."Extracted Customer" := CustomerName;
         EventProjectProposal."Task Description" := JobDescription;
         EventProjectProposal."Job Task Type" := EventProjectProposal."Job Task Type"::"Begin-Total";
         EventProjectProposal.Indentation := 0;
@@ -216,7 +235,7 @@ Use %1 as the project start date. Generate at least 4 tasks. Use yyyy-mm-dd for 
         EventProjectProposal."Job Task No." := Format(HeaderLineNo * 10 - 10);
         EventProjectProposal."Task Description" := CopyStr('Total ' + JobDescription, 1, MaxStrLen(EventProjectProposal."Task Description"));
         EventProjectProposal."Job Short Description" := JobDescription;
-        EventProjectProposal."Customer Name" := CustomerName;
+        EventProjectProposal."Extracted Customer" := CustomerName;
         EventProjectProposal."Job Task Type" := EventProjectProposal."Job Task Type"::"End-Total";
         EventProjectProposal.Indentation := 0;
         EventProjectProposal.Insert();
