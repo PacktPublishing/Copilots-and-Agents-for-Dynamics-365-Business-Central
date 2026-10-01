@@ -25,7 +25,7 @@ codeunit 50741 "Import Sess Proposals AI Tests"
         ActualMappings: Integer;
         Accuracy: Decimal;
     begin
-        HeadersCsv := AITTestContext.GetQuestion().ValueAsText();
+        HeadersCsv := AITTestContext.GetQuery().ValueAsText();
         RowInput := AITTestContext.GetInput();
         SampleRowText := '';
         SampleEl := RowInput.ElementExists('sample_row', SampleFound);

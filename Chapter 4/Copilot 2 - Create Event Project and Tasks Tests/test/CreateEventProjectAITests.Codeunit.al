@@ -26,7 +26,7 @@ codeunit 50721 "Create Event Project AI Tests"
         TaskCount: Integer;
         Found: Boolean;
     begin
-        Question := AITTestContext.GetQuestion().ValueAsText();
+        Question := AITTestContext.GetQuery().ValueAsText();
         Clear(EventProjectProposal);
 
         if not TryGenerateEventProject(CreateEventProjectImpl, Question, JobDescription, JobFullDescription, CustomerName, EventProjectProposal) then begin

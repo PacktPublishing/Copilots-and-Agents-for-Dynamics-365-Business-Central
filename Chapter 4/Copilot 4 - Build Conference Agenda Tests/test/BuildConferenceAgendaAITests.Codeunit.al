@@ -22,7 +22,7 @@ codeunit 50761 "Build Conf Agenda AI Tests"
         ProjFound: Boolean;
         ShowIntent: Boolean;
     begin
-        UserInput := AITTestContext.GetQuestion().ValueAsText();
+        UserInput := AITTestContext.GetQuery().ValueAsText();
         TestSetup := AITTestContext.GetTestSetup();
         ProjectEl := TestSetup.ElementExists('project_code', ProjFound);
         if ProjFound then

@@ -20,7 +20,7 @@ codeunit 50701 "Plan Event AI Tests"
         Found: Boolean;
     begin
         // [GIVEN] A question from the dataset
-        Question := AITTestContext.GetQuestion().ValueAsText();
+        Question := AITTestContext.GetQuery().ValueAsText();
 
         // [WHEN] The Plan Event copilot generates planning steps
         // Azure OpenAI may block some prompts (content management policy) and the impl calls Error() on failure.
