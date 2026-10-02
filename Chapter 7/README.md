@@ -65,7 +65,7 @@ The attendee rules run in `OnInsertRecord` of the agenda API page, not in a tabl
 6. Create the MCP server configuration `CronusEventsAttendee` as described in `Attendee Assistant/src/MCP/CronusEventsAttendee.mcpconfig.md`. Optionally create `CronusEventsDiscover`.
 7. Publish `website/index.html` on a public host (GitHub Pages is enough), add it to the agent as **Public website** knowledge, and paste the iframe from **Channels > Web app > Embed code** into the page (see `website/README.md`).
 
-To test **rateSession**, set the work date of the connection user to 11 June 2027 in the afternoon (a session can be rated once it has started, measured against the work date, as Chapter 6 does).
+A session can be rated from its date onwards, measured against today's date and not against the work date, because the rating arrives in a web service session where no user sets a work date. With the demo data (11 June 2027), **rateSession** returns the "has not started yet" error until that date; to see a rating accepted, change the date of one scheduled session to today on the **Event Sessions** page, set it back afterwards, and run **Reset Program Changes** to clear the two schedule changes this logs.
 
 ## Testing the tools before building the agent
 
@@ -90,4 +90,4 @@ Then run **Simulate Program Changes** (and **Reset Program Changes** to repeat t
 
 ## Build check
 
-Version 1.2.0.3 compiles without errors or CodeCop/UICop warnings (except AA0245 on the `rating` parameter of `rateSession`, kept because the parameter name is the JSON key of the bound action) against Business Central 29.0 with Chapter 3 – Common and Chapter 6 – Room Planning, and was tested end to end with Copilot Studio.
+Version 1.2.0.4 compiles without errors or CodeCop/UICop warnings (except AA0245 on the `rating` parameter of `rateSession`, kept because the parameter name is the JSON key of the bound action) against Business Central 29.0 with Chapter 3 – Common and Chapter 6 – Room Planning, and was tested end to end with Copilot Studio.

@@ -2,7 +2,7 @@
   "id": "7c1e2a90-4b7d-4f0e-9a61-2f9e6d3c7a07",
   "name": "Chapter 7 - Attendee Assistant",
   "publisher": "Packt",
-  "version": "1.2.0.3",
+  "version": "1.2.0.4",
   "brief": "Attendee-facing API pages for the Business Central MCP server.",
   "description": "Chapter 7 app. Publishes the program of an event (Chapter 3 Event Session, with the rooms of Chapter 6), the attendee's reservations (Chapter 6 Session Attendee Res. Entry) and a log of schedule changes as purpose-built API pages that an MCP server configuration turns into tools for the attendee assistant.",
   "privacyStatement": "",
