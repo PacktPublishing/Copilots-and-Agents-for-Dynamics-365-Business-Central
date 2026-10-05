@@ -51,12 +51,14 @@ codeunit 98206 "CE Attendee Agenda Mgt"
     end;
 
     /// <summary>
-    /// Business Central work date and time, consistent with Chapter 6, which
-    /// treats sessions before the work date as past.
+    /// A session can be rated from its date onwards. The check uses Today and
+    /// not the work date: the rating arrives through the API, in a web service
+    /// session where no user sets a work date. Only dates are compared, because
+    /// that session runs in UTC and Start Time is the local time of the venue.
     /// </summary>
     procedure SessionHasStarted(Session: Record "Event Session"): Boolean
     begin
-        exit(CreateDateTime(Session."Date", Session."Start Time") <= CreateDateTime(WorkDate(), Time()));
+        exit(Session."Date" <= Today());
     end;
 
     local procedure GetEventSession(SessionCode: Code[20]; var Session: Record "Event Session"): Boolean
