@@ -154,7 +154,8 @@ codeunit 50870 "Room Planning Agent Tests"
     /// <summary>
     /// Creates/resets an isolated project and three approved sessions the agent must fill.
     /// Two sessions run at the same time and only one fits the small room, so a correct
-    /// plan must not double-book the large room. The third session runs later.
+    /// plan must not double-book the large room. The third session runs later without
+    /// reservations, so the agent must estimate attendance from similar past sessions.
     /// Must not reuse demo project BC-TECH-2027 — the agent would plan T27-* instead.
     /// </summary>
     local procedure CreateRoomPlanningCase(Action: Codeunit "Test Input Json")
@@ -173,7 +174,7 @@ codeunit 50870 "Room Planning Agent Tests"
 
         CreateEvalSession('RPA-KEY', ProjectNo, SessionDate, 103000T, 'Opening Keynote', 380);
         CreateEvalSession('RPA-LAB', ProjectNo, SessionDate, 103000T, 'Hands-on Workshop', 25);
-        CreateEvalSession('RPA-DEV', ProjectNo, SessionDate, 130000T, 'Extending the Base App', 20);
+        CreateEvalSession('RPA-DEV', ProjectNo, SessionDate, 130000T, 'Extending the Base App', 0);
     end;
 
     local procedure CreateApprovedProject(ProjectNo: Code[20]; SessionDate: Date)
@@ -186,7 +187,7 @@ codeunit 50870 "Room Planning Agent Tests"
     end;
 
     /// <summary>
-    /// Creates the session (blank room/estimate) and seeds reservations only when none exist yet.
+    /// Creates the session with a blank room and estimate, then resets its reservations.
     /// </summary>
     local procedure CreateEvalSession(SessionCode: Code[20]; ProjectNo: Code[20]; SessionDate: Date; StartTime: Time; SessionName: Text[100]; ReservedAttendees: Integer)
     var
@@ -196,8 +197,8 @@ codeunit 50870 "Room Planning Agent Tests"
         EventDemoData.CreateScheduledSession(SessionCode, SessionName, ProjectNo, SessionDate, StartTime);
 
         ReservationEntry.SetRange("Session Code", SessionCode);
-        if ReservationEntry.IsEmpty() then
-            CreateReservations(SessionCode, ReservedAttendees);
+        ReservationEntry.DeleteAll();
+        CreateReservations(SessionCode, ReservedAttendees);
     end;
 
     local procedure CreateReservations(SessionCode: Code[20]; ReservationCount: Integer)
@@ -228,13 +229,29 @@ codeunit 50870 "Room Planning Agent Tests"
         SessionCode: Code[20];
         ConflictingSession: Record "Event Session";
         Found: Boolean;
+        ValidateNoReservationSessions: Boolean;
+        FoundNoReservationSession: Boolean;
     begin
         ExpectedData := AITTestContext.GetExpectedData();
+        CheckElement := ExpectedData.ElementExists('sessions_without_reservations_have_estimate', Found);
+        if Found then
+            ValidateNoReservationSessions := CheckElement.ValueAsBoolean();
 
         foreach SessionCode in EvalSessionCodes() do begin
             if not EventSession.Get(SessionCode) then begin
                 ErrorReason := StrSubstNo('Eval session %1 is missing.', SessionCode);
                 exit(false);
+            end;
+
+            if ValidateNoReservationSessions then begin
+                EventSession.CalcFields("Reserved Attendees");
+                if EventSession."Reserved Attendees" = 0 then begin
+                    FoundNoReservationSession := true;
+                    if EventSession."Estimated Attendees" <= 0 then begin
+                        ErrorReason := StrSubstNo('Session %1 has no reservations and no estimate from similar past sessions.', SessionCode);
+                        exit(false);
+                    end;
+                end;
             end;
 
             CheckElement := ExpectedData.ElementExists('all_scheduled_sessions_have_estimate', Found);
@@ -261,6 +278,11 @@ codeunit 50870 "Room Planning Agent Tests"
                     ErrorReason := StrSubstNo('Session %1 double-books room %2 with %3.', SessionCode, EventSession."Room Code", ConflictingSession."Code");
                     exit(false);
                 end;
+        end;
+
+        if ValidateNoReservationSessions and not FoundNoReservationSession then begin
+            ErrorReason := 'The dataset has no session without reservations.';
+            exit(false);
         end;
 
         exit(true);

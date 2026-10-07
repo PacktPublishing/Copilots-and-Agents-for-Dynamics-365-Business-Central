@@ -18,13 +18,15 @@ Agent evaluation test app for the **Room Planning Agent** (Chapter 6). Uses `Tes
 
 ## What the dataset checks
 
-The turn setup creates one project with three approved (`Scheduled`) sessions:
+The turn setup creates one project with three approved (`Scheduled`) sessions and resets their reservations:
 
 - `RPA-KEY` and `RPA-LAB` run at the same time. `RPA-KEY` has 380 reserved attendees (only `HALL-A` fits), `RPA-LAB` has 25 (fits `LAB-01`, and technically `HALL-A` too — but `HALL-A` is taken at that time).
-- `RPA-DEV` runs later with 20 reserved attendees, so it can reuse either room without conflict.
+- `RPA-DEV` runs later with no reservations. The agent must estimate its attendance from similar completed sessions before assigning a room.
 
-After the agent finishes, the test checks three outcomes directly on `Event Session`:
+After the agent finishes, the test checks these outcomes directly on `Event Session`:
 
+- Every scheduled session has an estimate (`all_scheduled_sessions_have_estimate`).
+- Every session without reservations has an estimate (`sessions_without_reservations_have_estimate`).
 - Every scheduled session has a room (`all_scheduled_sessions_have_room`).
 - No room is smaller than its demand (`no_room_over_capacity`).
 - No room is booked twice for an overlapping time slot (`no_double_booking`).

@@ -29,6 +29,7 @@ tests:
             instruction: The room plan looks good. Finish the assignment.
         expected_data:
           all_scheduled_sessions_have_estimate: true
+          sessions_without_reservations_have_estimate: true
           all_scheduled_sessions_have_room: true
           no_room_over_capacity: true
           no_double_booking: true
