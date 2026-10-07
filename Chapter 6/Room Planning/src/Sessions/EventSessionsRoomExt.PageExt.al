@@ -81,6 +81,8 @@ pageextension 50817 "Event Sessions Room Ext" extends "Event Sessions"
                 Caption = 'Find Similar';
                 Image = Find;
                 ToolTip = 'Finds other sessions by meaning of name, description, and speakers. Use Actual Attendees on similar past sessions to set Estimated Attendees for this session.';
+                // Hidden initially so readers can reproduce the baseline agent run before semantic search. Make visible when semantic search should be enabled.
+                Visible = false;
 
                 trigger OnAction()
                 begin
