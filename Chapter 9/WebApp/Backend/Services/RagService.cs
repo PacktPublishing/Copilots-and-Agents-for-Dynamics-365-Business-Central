@@ -34,7 +34,7 @@ public class RagService
         {
             _logger.LogInformation("Retrieving context for query: {Query}", query);
 
-            // Generate embedding for the query using Azure.AI.OpenAI EmbeddingClient
+            // Generate embedding for the query using EmbeddingClient
             var embeddingResult = await _embeddingClient.GenerateEmbeddingAsync(query, cancellationToken: cancellationToken);
             var embeddingArray = embeddingResult.Value.ToFloats().ToArray();
 

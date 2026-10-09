@@ -1,13 +1,14 @@
 using Azure;
-using Azure.AI.OpenAI;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Backend.Hubs;
 using Backend.Services;
 using Microsoft.Extensions.AI;
+using OpenAI;
 using OpenAI.Chat;
 using OpenAI.Embeddings;
 using Serilog;
+using System.ClientModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,20 +69,23 @@ var chatDeployment = builder.Configuration["AzureOpenAI:ChatDeploymentName"]
 var embeddingDeployment = builder.Configuration["AzureOpenAI:EmbeddingDeploymentName"] 
     ?? throw new InvalidOperationException("AzureOpenAI:EmbeddingDeploymentName is not configured");
 
-// Create Azure OpenAI client
-var azureClient = new AzureOpenAIClient(
-    new Uri(openAiEndpoint),
-    new AzureKeyCredential(openAiApiKey));
+// Use Azure's v1 API with the stable OpenAI SDK required by Agent Framework.
+var openAiClient = new OpenAIClient(
+    new ApiKeyCredential(openAiApiKey),
+    new OpenAIClientOptions
+    {
+        Endpoint = new Uri($"{openAiEndpoint.TrimEnd('/')}/openai/v1/")
+    });
 
 // Get ChatClient for Agent Framework orchestration
-var chatClient = azureClient.GetChatClient(chatDeployment);
+var chatClient = openAiClient.GetChatClient(chatDeployment);
 builder.Services.AddSingleton(chatClient);
 
 // Register IChatClient for Microsoft Agent Framework (using the extension method from Microsoft.Extensions.AI.OpenAI)
 builder.Services.AddSingleton<IChatClient>(chatClient.AsIChatClient());
 
-// Get EmbeddingClient for RAG embeddings (direct Azure.AI.OpenAI SDK usage)
-var embeddingClient = azureClient.GetEmbeddingClient(embeddingDeployment);
+// Get EmbeddingClient for RAG embeddings
+var embeddingClient = openAiClient.GetEmbeddingClient(embeddingDeployment);
 builder.Services.AddSingleton(embeddingClient);
 
 // Register application services

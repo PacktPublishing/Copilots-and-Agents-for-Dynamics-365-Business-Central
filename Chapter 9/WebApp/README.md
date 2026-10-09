@@ -1,6 +1,6 @@
 # RAG Chat Application - PDF Q&A with Microsoft Agent Framework
 
-A React web application with .NET 8 backend that enables users to chat with PDF documents using AI. The system uses **Microsoft Semantic Kernel** (Agent Framework) for orchestration, **Azure AI Search** for retrieval-augmented generation (RAG), and **Azure OpenAI** for generating intelligent responses with citations.
+A React web application with .NET 10 backend that enables users to chat with PDF documents using AI. The system uses **Microsoft Agent Framework** for orchestration, **Azure AI Search** for retrieval-augmented generation (RAG), and **Azure OpenAI** for generating intelligent responses with citations.
 
 ## Architecture
 
@@ -13,7 +13,7 @@ A React web application with .NET 8 backend that enables users to chat with PDF 
          │
          ↓ WebSocket (SignalR)
 ┌────────────────────────────────┐
-│     .NET 8 Web API             │  (Port 5000)
+│     .NET 10 Web API            │  (Port 5000)
 │  - SignalR Hub                 │
 │  - Document Upload Controller  │
 └────────┬───────────────────────┘
@@ -21,8 +21,8 @@ A React web application with .NET 8 backend that enables users to chat with PDF 
     ┌────┴─────┬──────────────┐
     ↓          ↓              ↓
 ┌─────────┐ ┌──────────┐ ┌─────────────────┐
-│Semantic │ │   RAG    │ │   Document      │
-│ Kernel  │ │ Service  │ │   Processor     │
+│ Agent   │ │   RAG    │ │   Document      │
+│Framework│ │ Service  │ │   Processor     │
 └────┬────┘ └────┬─────┘ └────┬────────────┘
      │           │             │
      ↓           ↓             ↓
@@ -37,7 +37,7 @@ A React web application with .NET 8 backend that enables users to chat with PDF 
 
 - ✅ **Real-time Streaming**: Chat responses stream in real-time via SignalR
 - ✅ **RAG Pipeline**: Retrieval-augmented generation with Azure AI Search
-- ✅ **Semantic Kernel**: Microsoft's agent framework for AI orchestration
+- ✅ **Microsoft Agent Framework**: Sequential RAG and summarization agents
 - ✅ **PDF Upload**: Upload and index PDF documents automatically
 - ✅ **Citations**: AI responses include source references with page numbers
 - ✅ **Modern UI**: Built with Microsoft Fluent UI components
@@ -48,7 +48,7 @@ A React web application with .NET 8 backend that enables users to chat with PDF 
 Before running the application, ensure you have:
 
 1. **Development Tools**
-   - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+   - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
    - [Node.js 18+](https://nodejs.org/) and npm
    - Code editor (VS Code recommended)
 
@@ -87,6 +87,8 @@ cd c:\TEMP\CONTOSOWEBAPP\Backend
   }
 }
 ```
+
+Keep `AzureOpenAI:Endpoint` as the resource root (for example, `https://YOUR_RESOURCE_NAME.openai.azure.com/`), not a deployment-specific URL or the `/openai/v1/` URL. The backend appends `/openai/v1/` and uses the stable OpenAI SDK for chat and embeddings. Existing API keys and deployment names are unchanged; no dated `api-version` setting is needed. Both deployments must support the Azure OpenAI v1 API, and embeddings must have 1,536 dimensions to match the search index.
 
 ### 2. Restore Backend Dependencies
 
@@ -163,7 +165,8 @@ CONTOSOWEBAPP/
 │   ├── Models/
 │   │   └── ChatModels.cs               # Data models
 │   ├── Services/
-│   │   ├── ChatService.cs              # Semantic Kernel integration
+│   │   ├── ChatService.cs              # Azure OpenAI streaming
+│   │   ├── AgentOrchestrationService.cs # Agent Framework RAG and summarization
 │   │   ├── RagService.cs               # Azure AI Search queries
 │   │   └── DocumentProcessor.cs        # PDF processing & indexing
 │   ├── Program.cs                      # App configuration
@@ -190,10 +193,11 @@ CONTOSOWEBAPP/
 ## Key Technologies
 
 ### Backend
-- **.NET 8**: Modern web API framework
-- **Microsoft Semantic Kernel 1.4.0**: Agent framework for AI orchestration
+- **.NET 10**: Modern web API framework
+- **Microsoft Agent Framework 1.24.0**: Stable agent packages for AI orchestration (`Microsoft.Agents.AI`, `Microsoft.Agents.AI.OpenAI`, and `Microsoft.Agents.AI.Workflows`)
+- **Microsoft.Extensions.AI.OpenAI 10.10.1**: Stable adapter for `IChatClient`
 - **Azure.Search.Documents 11.5.1**: Azure AI Search SDK
-- **Azure.AI.OpenAI**: Azure OpenAI integration
+- **OpenAI 2.14.0**: Stable SDK connecting to the Azure OpenAI v1 API
 - **SignalR**: Real-time WebSocket communication
 - **UglyToad.PdfPig**: PDF text extraction
 
@@ -223,7 +227,8 @@ CONTOSOWEBAPP/
    - Context formatted with citation markers [1], [2], etc.
 
 3. **Response Generation**
-   - Semantic Kernel receives user question + context
+   - Azure OpenAI receives the user question and retrieved context
+   - When summarization is enabled, Agent Framework runs a RAG agent followed by a summary agent
    - System prompt instructs GPT to use only provided context
    - Response streams back via SignalR
    - Citations sent at completion

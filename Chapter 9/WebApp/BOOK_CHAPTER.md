@@ -25,7 +25,7 @@ Users can toggle between getting full detailed answers or concise summaries.
 
 Don't worry if these terms are new to you - we'll explain everything as we build:
 
-- **Backend**: ASP.NET Core 8.0 (C#) - handles the server-side logic
+- **Backend**: ASP.NET Core 10.0 (C#) - handles the server-side logic
 - **Frontend**: React + TypeScript - provides the user interface
 - **AI Services**: Azure OpenAI - powers the chat and text understanding
 - **Search**: Azure AI Search - finds relevant document sections
@@ -35,30 +35,31 @@ Don't worry if these terms are new to you - we'll explain everything as we build
 
 ### Backend Technologies
 
-1. **ASP.NET Core 8.0**
+1. **ASP.NET Core 10.0**
    - Modern cross-platform framework for building web APIs
    - Provides built-in dependency injection and middleware support
    - Excellent performance and scalability
 
-2. **Azure.AI.OpenAI 2.1.0-beta.2**
-   - Official Azure OpenAI SDK for .NET
+2. **OpenAI 2.14.0**
+   - Stable OpenAI SDK for .NET, configured for the Azure OpenAI v1 API
    - Direct access to ChatClient and EmbeddingClient
    - Native support for streaming responses
    - No abstraction overhead for Azure OpenAI operations
 
-3. **Microsoft Agent Framework (Preview)**
-   - `Microsoft.Agents.AI 1.0.0-preview.251001.3`
-   - `Microsoft.Agents.AI.Workflows 1.0.0-preview.251001.3`
+3. **Microsoft Agent Framework 1.24.0 (Stable)**
+   - `Microsoft.Agents.AI 1.24.0`
+   - `Microsoft.Agents.AI.OpenAI 1.24.0`
+   - `Microsoft.Agents.AI.Workflows 1.24.0`
    - Framework for building and orchestrating AI agents
    - Enables sequential workflow patterns for multi-agent scenarios
 
-4. **Microsoft.Extensions.AI 9.9.0-preview**
+4. **Microsoft.Extensions.AI 10.10.0**
    - Unified AI abstraction layer for .NET
    - Provides common interfaces (IChatClient, IEmbeddingGenerator) across AI providers
    - Enables provider-agnostic agent orchestration
 
-5. **Microsoft.Extensions.AI.OpenAI 9.9.0-preview**
-   - Adapter package that bridges Azure.AI.OpenAI to IChatClient interface
+5. **Microsoft.Extensions.AI.OpenAI 10.10.1**
+   - Adapter package that bridges the OpenAI SDK to IChatClient interface
    - Provides `AsIChatClient()` extension method for ChatClient
    - Enables use of Azure OpenAI with frameworks expecting IChatClient
 
@@ -144,7 +145,7 @@ The application follows a modern three-tier architecture with clear separation o
 │           └──────────┬─────────────┘                        │
 │                      │                                       │
 │  ┌───────────────────▼─────────────────────────────────┐   │
-│  │     Azure.AI.OpenAI SDK / Microsoft.Extensions.AI    │   │
+│  │     OpenAI SDK / Microsoft.Extensions.AI            │   │
 │  │  - IChatClient (via AsIChatClient() adapter)        │   │
 │  │  - EmbeddingClient for vector generation            │   │
 │  └─────────────────────────────────────────────────────┘   │
@@ -296,7 +297,7 @@ public class RagService
 
 ##### **ChatService.cs** - Standard RAG Chat
 
-Provides detailed, comprehensive responses without summarization. Uses `ChatClient` directly from Azure.AI.OpenAI:
+Provides detailed, comprehensive responses without summarization. Uses `ChatClient` from the OpenAI SDK against Azure OpenAI:
 
 ```csharp
 using Backend.Models;
@@ -878,9 +879,9 @@ The application combines Microsoft Agent Framework with Microsoft.Extensions.AI:
 
 1. **ChatClientAgent** (Microsoft.Agents.AI): Creates named agents with instructions
 2. **IChatClient Interface**: Unified interface for chat completion across providers
-3. **ChatClient** (Azure.AI.OpenAI): Direct SDK for streaming responses
-4. **EmbeddingClient** (Azure.AI.OpenAI): Generates embeddings for vector search
-5. **AsIChatClient() Extension**: Bridges Azure.AI.OpenAI ChatClient to IChatClient
+3. **ChatClient** (OpenAI): Direct SDK for streaming responses from Azure OpenAI
+4. **EmbeddingClient** (OpenAI): Generates embeddings for vector search
+5. **AsIChatClient() Extension**: Bridges the OpenAI ChatClient to IChatClient
 
 ## Step-by-Step Implementation Guide
 
@@ -891,9 +892,9 @@ This guide assumes you are starting from scratch. We'll explain each step in det
 Before you begin, make sure you have:
 
 1. **Development Environment:**
-   - **Visual Studio 2022** (Community edition is free) OR **VS Code** with C# Dev Kit extension
+   - **Visual Studio 2026** (Community edition is free) OR **VS Code** with C# Dev Kit extension
    - **Node.js 18+** - Download from https://nodejs.org
-   - **.NET 8 SDK** - Download from https://dotnet.microsoft.com/download
+   - **.NET 10 SDK** - Download from https://dotnet.microsoft.com/download/dotnet/10.0
 
 2. **Azure Account & Resources:**
    - An Azure subscription (free tier available at https://azure.microsoft.com/free)
@@ -923,7 +924,7 @@ cd RagChatApp
 dotnet new sln -n RagChatApp
 
 # 3. Create a new ASP.NET Core Web API project called "Backend"
-dotnet new webapi -n Backend
+dotnet new webapi -n Backend --framework net10.0
 
 # 4. Add the Backend project to the solution
 dotnet sln add Backend/Backend.csproj
@@ -932,17 +933,18 @@ dotnet sln add Backend/Backend.csproj
 cd Backend
 
 # 6. Add all the NuGet packages we need (these are libraries that add functionality)
-dotnet add package Azure.AI.OpenAI --version 2.1.0-beta.2
-dotnet add package Microsoft.Extensions.AI.OpenAI --version 9.9.0-preview.1.25458.4
+dotnet add package OpenAI --version 2.14.0
+dotnet add package Microsoft.Extensions.AI.OpenAI --version 10.10.1
 dotnet add package Azure.Search.Documents --version 11.5.1
 dotnet add package Docnet.Core --version 2.6.0
-dotnet add package Microsoft.Agents.AI --version 1.0.0-preview.251001.3
-dotnet add package Microsoft.Agents.AI.Workflows --version 1.0.0-preview.251001.3
-dotnet add package Serilog.AspNetCore --version 8.0.0
+dotnet add package Microsoft.Agents.AI --version 1.24.0
+dotnet add package Microsoft.Agents.AI.OpenAI --version 1.24.0
+dotnet add package Microsoft.Agents.AI.Workflows --version 1.24.0
+dotnet add package Serilog.AspNetCore --version 10.0.0
 ```
 
 **What each package does:**
-- `Azure.AI.OpenAI`: Connects to Azure OpenAI for chat and embeddings
+- `OpenAI`: Connects to Azure OpenAI's v1 API for chat and embeddings
 - `Microsoft.Extensions.AI.OpenAI`: Provides the `IChatClient` interface for agent orchestration
 - `Azure.Search.Documents`: Connects to Azure AI Search for document retrieval
 - `Docnet.Core`: Extracts text from PDF files
@@ -1477,15 +1479,16 @@ This is the main configuration file that wires everything together. Replace the 
 
 ```csharp
 using Azure;
-using Azure.AI.OpenAI;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Backend.Hubs;
 using Backend.Services;
 using Microsoft.Extensions.AI;
+using OpenAI;
 using OpenAI.Chat;
 using OpenAI.Embeddings;
 using Serilog;
+using System.ClientModel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -1538,20 +1541,23 @@ var openAiApiKey = builder.Configuration["AzureOpenAI:ApiKey"]!;
 var chatDeployment = builder.Configuration["AzureOpenAI:ChatDeploymentName"]!;
 var embeddingDeployment = builder.Configuration["AzureOpenAI:EmbeddingDeploymentName"]!;
 
-// Create Azure OpenAI client
-var azureClient = new AzureOpenAIClient(
-    new Uri(openAiEndpoint),
-    new AzureKeyCredential(openAiApiKey));
+// Keep the configured endpoint as the resource root; append the v1 API path.
+var openAiClient = new OpenAIClient(
+    new ApiKeyCredential(openAiApiKey),
+    new OpenAIClientOptions
+    {
+        Endpoint = new Uri($"{openAiEndpoint.TrimEnd('/')}/openai/v1/")
+    });
 
 // Get ChatClient for standard chat operations (used by ChatService)
-var chatClient = azureClient.GetChatClient(chatDeployment);
+var chatClient = openAiClient.GetChatClient(chatDeployment);
 builder.Services.AddSingleton(chatClient);
 
 // Register IChatClient for Agent Framework (uses the AsIChatClient() adapter)
 builder.Services.AddSingleton<IChatClient>(chatClient.AsIChatClient());
 
 // Get EmbeddingClient for RAG embeddings
-var embeddingClient = azureClient.GetEmbeddingClient(embeddingDeployment);
+var embeddingClient = openAiClient.GetEmbeddingClient(embeddingDeployment);
 builder.Services.AddSingleton(embeddingClient);
 
 // Register application services
@@ -1974,7 +1980,7 @@ Before deployment, you need to provision the following Azure resources:
 
 3. **Azure App Service (Backend)**
    - Windows or Linux App Service Plan (B1 or higher)
-   - .NET 8 runtime
+   - .NET 10 runtime (confirm availability for the selected hosting environment)
 
 4. **Azure Static Web Apps (Frontend)**
    - Standard tier for custom domains and enterprise features
@@ -2057,7 +2063,7 @@ az webapp create \
   --name app-ragchat-backend-prod \
   --resource-group rg-ragchat-prod \
   --plan asp-ragchat-prod \
-  --runtime "DOTNET|8.0"
+  --runtime "DOTNET|10.0"
 ```
 
 **1.5 Create Application Insights:**
@@ -2136,7 +2142,7 @@ Create `Backend/appsettings.Production.json`:
     "LogLevel": {
       "Default": "Information",
       "Microsoft.AspNetCore": "Warning",
-      "Azure.AI.OpenAI": "Information"
+      "OpenAI": "Information"
     },
     "ApplicationInsights": {
       "LogLevel": {
@@ -2212,7 +2218,7 @@ dotnet add package Microsoft.ApplicationInsights.AspNetCore
 az webapp config set \
   --name app-ragchat-backend-prod \
   --resource-group rg-ragchat-prod \
-  --linux-fx-version "DOTNET|8.0"
+  --linux-fx-version "DOTNET|10.0"
 
 # Enable WebSockets for SignalR
 az webapp config set \
@@ -2510,7 +2516,7 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: app-ragchat-backend-prod
-  DOTNET_VERSION: '8.0.x'
+  DOTNET_VERSION: '10.0.x'
 
 jobs:
   build-and-deploy:
