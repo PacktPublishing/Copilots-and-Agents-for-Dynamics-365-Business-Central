@@ -1,0 +1,11 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "APP_KIND": "workflowapp",
+    "ProjectDirectoryPath": "c:\\Users\\stefano\\OneDrive\\Packt\\AI Agents for Business Central (proposal)\\AI-solutions-for-Dynamics-365-Business-Central",
+    "WORKFLOWS_AUTHENTICATION_METHOD": "managedServiceIdentity",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "FUNCTIONS_INPROC_NET8_ENABLED": "1",
+    "AzureWebJobsSecretStorageType": "Files"
+  }
+}
