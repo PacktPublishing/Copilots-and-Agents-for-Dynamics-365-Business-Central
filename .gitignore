@@ -1,5 +1,0 @@
-*.code-workspace
-
-# bc-agent-export-to-al pipeline artifacts (template resolution, manifest, scaffold/verify
-# reports). Debug output for the person running the conversion, not part of the AL app.
-*- Conversion Report/

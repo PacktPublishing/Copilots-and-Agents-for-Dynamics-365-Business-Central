@@ -1,10 +1,10 @@
-page 50101 "Contoso Events RAG Setup"
+page 50101 "CRONUS Events RAG Setup"
 {
     PageType = Card;
     ApplicationArea = All;
     UsageCategory = Administration;
-    Caption = 'Contoso Events RAG Setup';
-    SourceTable = "Contoso Events RAG Setup";
+    Caption = 'CRONUS Events RAG Setup';
+    SourceTable = "CRONUS Events RAG Setup";
     SourceTableTemporary = false;
     DelayedInsert = true;
 

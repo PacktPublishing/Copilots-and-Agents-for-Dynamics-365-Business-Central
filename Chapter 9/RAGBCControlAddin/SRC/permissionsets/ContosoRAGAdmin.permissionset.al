@@ -1,8 +1,9 @@
-permissionset 50100 ContosoRAGAdmin
+permissionset 50100 CRONUSRAGAdmin
 {
+    Caption = 'CRONUS Events RAG Admin';
     Assignable = true;
-    Permissions = tabledata "Contoso Events RAG Setup"=RIMD,
-        table "Contoso Events RAG Setup"=X,
-        page "Contoso Events RAG"=X,
-        page "Contoso Events RAG Setup"=X;
+    Permissions = tabledata "CRONUS Events RAG Setup" = RIMD,
+        table "CRONUS Events RAG Setup" = X,
+        page "CRONUS Events RAG" = X,
+        page "CRONUS Events RAG Setup" = X;
 }
