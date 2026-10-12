@@ -1,6 +1,6 @@
-table 50100 "Contoso Events RAG Setup"
+table 50100 "CRONUS Events RAG Setup"
 {
-    Caption = 'RAG Setup';
+    Caption = 'CRONUS Events RAG Setup';
     DataClassification = ToBeClassified;
 
     fields

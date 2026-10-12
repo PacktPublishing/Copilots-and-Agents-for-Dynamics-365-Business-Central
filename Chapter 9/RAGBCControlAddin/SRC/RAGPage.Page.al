@@ -1,9 +1,9 @@
-page 50100 "Contoso Events RAG"
+page 50100 "CRONUS Events RAG"
 {
     PageType = Card;
     ApplicationArea = All;
     UsageCategory = Administration;
-    Caption = 'Contoso Events RAG';
+    Caption = 'CRONUS Events RAG';
     SourceTable = "Integer";
 
     layout
@@ -16,14 +16,13 @@ page 50100 "Contoso Events RAG"
 
                 trigger ControlAddInReady()
                 var
-                    RAGSetup: Record "Contoso Events RAG Setup";
+                    RAGSetup: Record "CRONUS Events RAG Setup";
                     WebPageUrl: Text;
                 begin
                     if RAGSetup.Get('DEFAULT') then
                         WebPageUrl := RAGSetup."Web Page URL"
                     else
                         WebPageUrl := '';
-
                     if WebPageUrl <> '' then begin
                         CurrPage.RAGWebPageAddin.Initialize(WebPageUrl);
                     end else begin

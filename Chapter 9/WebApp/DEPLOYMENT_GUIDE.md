@@ -73,14 +73,14 @@ The backend uses stable Microsoft Agent Framework packages and the stable OpenAI
 4. Right-click → **Send to** → **Compressed (zipped) folder**
 5. Name it: **`app-service-deploy.zip`**
 6. The ZIP file is created in the `publish` folder
-7. **Move** it to the project root (`C:\TEMP\CONTOSOWEBAPP\`)
+7. **Move** it to the project root (`C:\TEMP\CRONUSWEBAPP\`)
 
 **Option B: Using PowerShell (Faster)**
 
 1. Open **PowerShell**
 2. Run:
    ```powershell
-   cd C:\TEMP\CONTOSOWEBAPP
+   cd C:\TEMP\CRONUSWEBAPP
    Compress-Archive -Path .\Backend\publish\* -DestinationPath .\app-service-deploy.zip -Force
    ```
 3. The ZIP file is created in the project root, outside the publish folder
@@ -90,7 +90,7 @@ The backend uses stable Microsoft Agent Framework packages and the stable OpenAI
 ### Step 5: Verify the ZIP File
 
 1. Open File Explorer
-2. Navigate to **`C:\TEMP\CONTOSOWEBAPP\`**
+2. Navigate to **`C:\TEMP\CRONUSWEBAPP\`**
 3. Look for **`app-service-deploy.zip`**
 4. Open the archive and confirm that `Backend.dll`, `Backend.deps.json`, and `Backend.runtimeconfig.json` are at its root, with `wwwroot\index.html` inside the archive
 5. For Windows App Service, also confirm that the published `web.config` is at the archive root

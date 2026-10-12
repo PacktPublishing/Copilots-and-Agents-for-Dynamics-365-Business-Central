@@ -65,7 +65,7 @@ Before running the application, ensure you have:
 ### 1. Clone and Configure Backend
 
 ```powershell
-cd c:\TEMP\CONTOSOWEBAPP\Backend
+cd c:\TEMP\CRONUSWEBAPP\Backend
 
 # Configure Azure services in appsettings.Development.json
 # Edit the file with your Azure resource details:
@@ -109,7 +109,7 @@ npm install
 ### Start Backend (Terminal 1)
 
 ```powershell
-cd c:\TEMP\CONTOSOWEBAPP\Backend
+cd c:\TEMP\CRONUSWEBAPP\Backend
 dotnet run
 ```
 
@@ -123,7 +123,7 @@ Starting RAG Chat API on http://localhost:5000
 ### Start Frontend (Terminal 2)
 
 ```powershell
-cd c:\TEMP\CONTOSOWEBAPP\Frontend
+cd c:\TEMP\CRONUSWEBAPP\Frontend
 npm run dev
 ```
 
@@ -156,7 +156,7 @@ Open your browser to: **http://localhost:5173**
 ## Project Structure
 
 ```
-CONTOSOWEBAPP/
+CRONUSWEBAPP/
 ├── Backend/
 │   ├── Controllers/
 │   │   └── DocumentController.cs       # PDF upload endpoint
